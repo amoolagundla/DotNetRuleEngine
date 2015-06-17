@@ -26,7 +26,7 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
     //Synchronous (also supports asynchronous)
     ruleEngineExecutor.Execute();
 ```
-## **Order (domain model)** ##
+#### **Order (domain model)** ####
 
 ```csharp
     public class Order
@@ -57,9 +57,9 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 ----------
 <br />
 
-## **RuleEngine API :** ##
+### **RuleEngine API :** ###
 
-## **Synchronous:** ##
+#### **Synchronous:** ####
 
 ```csharp
 	//Create an instance of your model
@@ -72,7 +72,7 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 	p.Execute();
 ```
 
-## **Asynchronous:** ##
+#### **Asynchronous:** ####
 
 ```csharp
     Product p = new Product();
@@ -83,7 +83,7 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 	await p.ExecuteAsync();
 ```
 
-## **Product (domain model)** ##
+#### **Product (domain model)** ####
 
 ```csharp
     //Inherit your model from RuleEngine<T>
