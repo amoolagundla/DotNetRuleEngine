@@ -57,9 +57,9 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 ----------
 <br />
 
-### **RuleEngine API :** ###
+### **RuleEngine:** ###
 
-#### **Synchronous:** ####
+#### **Synchronous API:** ####
 
 ```csharp
 	//Create an instance of your model
@@ -72,7 +72,7 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 	p.Execute();
 ```
 
-#### **Asynchronous:** ####
+#### **Asynchronous API:** ####
 
 ```csharp
     Product p = new Product();
