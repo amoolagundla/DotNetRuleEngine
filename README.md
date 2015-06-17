@@ -57,7 +57,7 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 ----------
 <br />
 
-## **DotNetRuleEngine API :** ##
+## **RuleEngine API :** ##
 
 ## **Synchronous:** ##
 
