@@ -13,9 +13,9 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 
 *If you prefer not to inherit your domain model(s) from RuleEngine, you can use RuleEngineExecutor.*
 
-## **RuleEngineExecutor API :** ##
+### **RuleEngineExecutor:** ###
 
-## **Synchronous:** ##
+#### **Synchronous API:** ####
 
 ```csharp
 	Order order = new Order { Amount = 10.99m };
