@@ -1,11 +1,12 @@
-# DotNetRuleEngine (Rule Based Software Development)
+# DotNetRuleEngine #
+## (Rule Based Software Development) ##
 
 <br />
 > DotNetRuleEngine is a ***Rule Engine*** that allows you to write sophisticated 
 > rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution. But most importantly it does this in a very simple and elegant way. You don't need to invest so much of your precious time to learn a whole new framework.
 
 
-Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.2.5](https://www.nuget.org/packages/DotNetRuleEngine/1.2.5 "DotNetRuleEngine")
+Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0.0](https://www.nuget.org/packages/DotNetRuleEngine/1.0.0 "DotNetRuleEngine")
 
 **Usage:**
 
