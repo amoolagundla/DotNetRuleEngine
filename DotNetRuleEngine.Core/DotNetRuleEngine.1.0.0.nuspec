@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>DotNetRuleEngine</id>
+        <version>1.0.0</version>
+        <title>DotNetRuleEngine</title>
+        <authors>Arif Yayalar</authors>
+        <owners>Arif Yayalar</owners>
+        <projectUrl>https://github.com/ayayalar/DotNetRuleEngine</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>DotNetRuleEngine is a Rule Engine that allows you to write sophisticated 
+rules to keep your code clean and structured. Supports both synchronous and asynchronous execution. But most importantly it does this in a very simple and elegant way. You don't need to invest so much of your precious time to learn a whole new framework.</description>
+        <summary>Rule Based Software Development</summary>
+        <releaseNotes>First release. (Previously known as B.Rule)</releaseNotes>
+        <copyright>MIT</copyright>
+        <language>en-US</language>
+        <tags>Business Rule Engine Validation Constraint</tags>
+    </metadata>
+    <files>
+        <file src="lib\net45\_._" target="lib\net45\_._" />
+        <file src="bin\Debug\DotNetRuleEngine.dll" target="lib\DotNetRuleEngine.dll" />
+        <file src="bin\Debug\DotNetRuleEngine.pdb" target="lib\DotNetRuleEngine.pdb" />
+    </files>
+</package>
