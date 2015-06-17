@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+        <id>B.Rule</id>
+        <version>1.0.0</version>
+        <title>B.Rule</title>
+        <authors>Arif Yayalar</authors>
+        <projectUrl>https://github.com/ayayalar/B.Rule</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>B.Rule is a Business Rule Engine that allows you to write sophisticated Business Rules to keep your code clean and structured. Supports both synchronous &amp; asynchronous execution</description>
+        <summary>Business Rule Engine that allows you to write sophisticated Business Rules to keep your code clean and structured</summary>
+    </metadata>
+</package>
