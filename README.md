@@ -6,7 +6,7 @@
 > rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution. But most importantly it does this in a very simple and elegant way.
 
 
-Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0.0](https://www.nuget.org/packages/DotNetRuleEngine/1.0.0 "DotNetRuleEngine")
+Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.1.0](https://www.nuget.org/packages/DotNetRuleEngine/1.1.0 "DotNetRuleEngine")
 
 **Usage:**
 
@@ -36,8 +36,6 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        private Stopwatch _stopwatch;
-
         public void Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
@@ -45,24 +43,14 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
                 throw new InvalidOperationException();
             }
         }
-
-		//Runs before the Invoke method
-        public override void BeforeInvoke()
-        {
-			_stopwatch = Stopwatch.StartNew();
-        }
-
-		//Runs after the Invoke method
-        public override void AfterInvoke(Order order)
-        {
-            var totalRuntimeMs = _stopwatch.ElapsedMilliseconds;
-        }
     }
 ```
 
 <br />
 ----------
 <br />
+
+>The difference between RuleEngineExecutor and RuleEngine, when you use RuleEngine, your model *must* inherit from RuleEngine. RuleEngineExecutor doesn't have this requirement.
 
 ### **RuleEngine:** ###
 
@@ -108,15 +96,6 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
     //Implement IRule<T> for synchronous rules
 	public class UpdateDescription : Rule<Product>
     {
-        public UpdateDescription()
-        {
-            //Invoke method will not get called if constraint returns false
-            Constraint = product => product.Description == "Desktop Computer";
-
-            //Remaining business rules will not execute if set to true
-            Terminate = true;
-        }
-
         public void Invoke(Product product)
         {
             product.Description = "Desktop Computer";
@@ -135,9 +114,6 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
             //Simulate API call to external service
             await Task.Delay(10);
 
-            //Store data to share among other rules
-            product.TryAdd("Description", "Desktop Computer");
-
             product.Description = "Desktop Computer";
         }
     }
@@ -153,10 +129,164 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
             //Simulate API call to external service
             await Task.Delay(10);
 
-            //Get data from another business rule
-            var description = product.TryGetValue("Description");
+            product.Name = "Dell Inspiron";
+        }
+    }
+```
 
-            product.Name = "Desktop Computer" + " " + description;
+----------
+
+# Features #
+
+## NestedRule/NestedRuleAsync ##
+
+Rules can be nested. Means a rule can contain other rules. Derive from NestedRule or NestedRuleAsync to implement nested rules.
+
+#### Example ####
+```csharp
+    public class IsValidAmount : NestedRule<Order>
+    {   
+        public void Invoke(Order order)
+        {
+            AddRules(new AmountGreaterThan1000());
+			Execute();
+        }
+    }
+```
+```csharp
+    public class AmountGreaterThan1000 : Rule<Order>
+    {   
+        public void Invoke(Order order)
+        {
+            if (order.Amount > 1000)
+            {
+                order.Shipping = 5;
+            }
+        }
+    }
+```
+
+## Before/After Invoke ##
+Rules have Before and After Invoke methods. These methods get invoked before and after the Invoke method as their name indicates.
+
+#### Example ####
+```csharp
+    public class IsValidAmount : Rule<Order>
+    {   
+        private Stopwatch _stopwatch;
+
+        public void Invoke(Order order)
+        {
+            if (order.Amount <= 0.0m)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+		//Runs before the Invoke method
+        public override void BeforeInvoke()
+        {
+			_stopwatch = Stopwatch.StartNew();
+        }
+
+		//Runs after the Invoke method
+        public override void AfterInvoke(Order order)
+        {
+            var totalRuntimeMs = _stopwatch.ElapsedMilliseconds;
+        }
+    }
+```
+
+## Skip ##
+You can mark any rule to be skipped by setting Skip = true. Setting it inside the Invoke method will be ignored.
+
+#### Example ####
+```csharp
+    public class IsValidAmount : Rule<Order>
+    {   
+        public void Invoke(Order order)
+        {
+            if (order.Amount <= 0.0m)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+		//Runs before the Invoke method
+        public override void BeforeInvoke()
+        {
+			Skip = true;
+        }
+    }
+```
+
+## Terminate ##
+At anytime you can terminate executing the remaining business rules by setting Terminate = true
+
+#### Example ####
+```csharp
+    public class IsValidAmount : Rule<Order>
+    {   
+        public void Invoke(Order order)
+        {
+            if (order.Amount <= 0.0m)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+		//Runs before the Invoke method
+        public override void BeforeInvoke()
+        {
+			Terminate = true;
+        }
+    }
+```
+
+## Constraint ##
+If Constraint property evaluated to false condition, Invoke method will not be executed. Setting it inside the Invoke method will be ignored.
+
+#### Example ####
+```csharp
+    public class IsValidAmount : Rule<Order>
+    {   
+        public void Invoke(Order order)
+        {
+            if (order.Amount <= 0.0m)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+
+		//Runs before the Invoke method
+        public override void BeforeInvoke()
+        {
+			Constraint = order => order.Amount > 1000;
+        }
+    }
+```
+
+## TryAdd/TryGet ##
+If Constraint property evaluated to false condition, Invoke method will not be executed. Setting it inside the Invoke method will be ignored.
+
+#### Example ####
+```csharp
+    public class UpdateDescription : Rule<Product>
+    {
+        public void Invoke(Product product)
+        {
+            //Store data to share with the other rules
+            product.TryAdd("Description", "Desktop Computer");
+        }
+    }
+```
+```csharp
+    public class UpdateName : Rule<Product>
+    {
+        public void Invoke(Product product)
+        {
+            //Rerieve data stored by another business rule
+            var description = product.TryGetValue("Description");
         }
     }
 ```
