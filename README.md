@@ -6,7 +6,11 @@
 > rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution. But most importantly it does this in a very simple and elegant way.
 
 
-Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.1.0](https://www.nuget.org/packages/DotNetRuleEngine/1.1.0 "DotNetRuleEngine")
+```csharp
+    PM> Install-Package DotNetRuleEngine
+```
+Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.1.0 "DotNetRuleEngine")
+
 
 **Usage:**
 
@@ -46,9 +50,8 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.1
     }
 ```
 
-<br />
 ----------
-<br />
+
 
 >The difference between RuleEngineExecutor and RuleEngine, when you use RuleEngine, your model *must* inherit from RuleEngine. RuleEngineExecutor doesn't have this requirement.
 
