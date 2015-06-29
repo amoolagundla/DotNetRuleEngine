@@ -14,20 +14,32 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 
 **Usage:**
 
-### **RuleEngineExecutor:** ###
+#### **RuleEngineExecutor API:** ####
 
-#### **Synchronous API:** ####
+##### **Synchronous:** #####
 
 ```csharp
 	Order order = new Order { Amount = 10.99m };
 
     RuleEngineExecutor<Order> ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmount());
-
-    //Synchronous (also supports asynchronous)
+   
     ruleEngineExecutor.Execute();
 ```
-#### **Order (domain model)** ####
+
+
+##### **Asynchronous:** #####
+
+```csharp
+	Order order = new Order { Amount = 10.99m };
+
+    RuleEngineExecutor<Order> ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
+    ruleEngineExecutor.AddRules(new IsValidAmountAsync());
+    
+    ruleEngineExecutor.ExecuteAsync();
+```
+
+##### **Order (domain model)** #####
 
 ```csharp
     public class Order
@@ -36,11 +48,11 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	}
 ```
 
-#### **IsValidAmount Rule (Synchronous)** ####
+##### **IsValidAmount *Rule* (Synchronous)** #####
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public void Invoke(Order order)
+        public override void Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
@@ -50,14 +62,31 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     }
 ```
 
-----------
+##### **IsValidAmountAsync *Rule* (Asynchronous)** #####
+```csharp
+    public class IsValidAmountAsync : RuleAsync<Order>
+    {   
+        public override async Task Invoke(Order order)
+        {
+            //Simulate API call to external service
+
+			await Task.Delay(10);
+            if (order.Amount <= 0.0m)
+            {
+                throw new InvalidOperationException();
+            }
+        }
+    }
+```
+
+<br />
 
 
 >The difference between RuleEngineExecutor and RuleEngine, when you use RuleEngine, your model *must* inherit from RuleEngine. RuleEngineExecutor doesn't have this requirement.
 
-### **RuleEngine:** ###
+#### **RuleEngine API** ####
 
-#### **Synchronous API:** ####
+##### **Synchronous** #####
 
 ```csharp
 	//Create an instance of your model
@@ -70,7 +99,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	p.Execute();
 ```
 
-#### **Asynchronous API:** ####
+##### **Asynchronous** #####
 
 ```csharp
     Product p = new Product();
@@ -81,7 +110,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	await p.ExecuteAsync();
 ```
 
-#### **Product (domain model)** ####
+##### **Product (domain model)** #####
 
 ```csharp
     //Inherit your model from RuleEngine<T>
@@ -93,7 +122,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	}
 ```
  
-#### **UpdateDescription Business Rule (Synchronous)** ####
+##### **UpdateDescription *Rule* (Synchronous)** #####
     
 ```csharp
     //Implement IRule<T> for synchronous rules
@@ -106,7 +135,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     }
 ```
 
-#### **UpdateDescriptionAsync Business Rule (Asynchronous)** ####
+##### **UpdateDescriptionAsync *Rule* (Asynchronous)** #####
 
 ```csharp
     //Implement IRuleAsync<T> for asynchronous rules
@@ -122,7 +151,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     }
 ```
 
-#### **UpdateNameAsync Business Rule (Asynchronous)** ####
+##### **UpdateNameAsync *Rule* (Asynchronous)** #####
 
 ```csharp
     public class UpdateNameAsync : RuleAsync<Product>
@@ -139,13 +168,13 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 
 ----------
 
-# Features #
+#### Features ####
 
-## NestedRule/NestedRuleAsync ##
+##### NestedRule/NestedRuleAsync #####
 
 Rules can be nested. Means a rule can contain other rules. Derive from NestedRule or NestedRuleAsync to implement nested rules.
 
-#### Example ####
+###### Example ######
 ```csharp
     public class IsValidAmount : NestedRule<Order>
     {   
@@ -169,10 +198,10 @@ Rules can be nested. Means a rule can contain other rules. Derive from NestedRul
     }
 ```
 
-## Before/After Invoke ##
+##### Before/After Invoke #####
 Rules have Before and After Invoke methods. These methods get invoked before and after the Invoke method as their name indicates.
 
-#### Example ####
+###### Example ######
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
@@ -200,10 +229,10 @@ Rules have Before and After Invoke methods. These methods get invoked before and
     }
 ```
 
-## Skip ##
+##### Skip #####
 You can mark any rule to be skipped by setting Skip = true. Setting it inside the Invoke method will be ignored.
 
-#### Example ####
+###### Example ######
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
@@ -223,10 +252,10 @@ You can mark any rule to be skipped by setting Skip = true. Setting it inside th
     }
 ```
 
-## Terminate ##
+##### Terminate #####
 At anytime you can terminate executing the remaining business rules by setting Terminate = true
 
-#### Example ####
+###### Example ######
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
@@ -246,10 +275,10 @@ At anytime you can terminate executing the remaining business rules by setting T
     }
 ```
 
-## Constraint ##
+##### Constraint #####
 If Constraint property evaluated to false condition, Invoke method will not be executed. Setting it inside the Invoke method will be ignored.
 
-#### Example ####
+###### Example ######
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
@@ -269,10 +298,10 @@ If Constraint property evaluated to false condition, Invoke method will not be e
     }
 ```
 
-## TryAdd/TryGet ##
+##### TryAdd/TryGet #####
 If Constraint property evaluated to false condition, Invoke method will not be executed. Setting it inside the Invoke method will be ignored.
 
-#### Example ####
+###### Example ######
 ```csharp
     public class UpdateDescription : Rule<Product>
     {
