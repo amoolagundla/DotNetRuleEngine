@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="BusinessRules\EnsureProductNameIsNotNull.cs" />
     <Compile Include="BusinessRules\IsValidAmount.cs" />
+    <Compile Include="BusinessRules\IsValidAmountAsync.cs" />
     <Compile Include="BusinessRules\ValidatePrice.cs" />
     <Compile Include="BusinessRules\ValidateNameWithConstraint.cs" />
     <Compile Include="NestedBusinessRuleTest.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="BusinessRules\ValidateDescription.cs" />
     <Compile Include="BusinessRules\UpdateProductNameAsync.cs" />
     <Compile Include="BusinessRules\UpdateProductDescriptionAsync.cs" />
-    <Compile Include="BRuleWrapperTest.cs" />
+    <Compile Include="RuleEngineExecutorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetRuleEngine.Model\DotNetRuleEngine.Model.csproj">

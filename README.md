@@ -3,15 +3,12 @@
 
 <br />
 > DotNetRuleEngine is a ***Rule Engine*** that allows you to write sophisticated 
-> rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution. But most importantly it does this in a very simple and elegant way. You don't need to invest so much of your precious time to learn a whole new framework.
+> rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution. But most importantly it does this in a very simple and elegant way.
 
 
 Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0.0](https://www.nuget.org/packages/DotNetRuleEngine/1.0.0 "DotNetRuleEngine")
 
 **Usage:**
-
-
-*If you prefer not to inherit your domain model(s) from RuleEngine, you can use RuleEngineExecutor.*
 
 ### **RuleEngineExecutor:** ###
 
@@ -37,18 +34,28 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 
 #### **IsValidAmount Rule (Synchronous)** ####
 ```csharp
-    public class IsValidAmount : IRule<Order>
-    {
-        public Expression<Predicate<Order>> Constraint { get; set; }
+    public class IsValidAmount : Rule<Order>
+    {   
+        private Stopwatch _stopwatch;
 
-        public bool Terminate { get; set; }
-        
         public void Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
             }
+        }
+
+		//Runs before the Invoke method
+        public override void BeforeInvoke()
+        {
+			_stopwatch = Stopwatch.StartNew();
+        }
+
+		//Runs after the Invoke method
+        public override void AfterInvoke(Order order)
+        {
+            var totalRuntimeMs = _stopwatch.ElapsedMilliseconds;
         }
     }
 ```
@@ -99,7 +106,7 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
     
 ```csharp
     //Implement IRule<T> for synchronous rules
-	public class UpdateDescription : IRule<Product>
+	public class UpdateDescription : Rule<Product>
     {
         public UpdateDescription()
         {
@@ -110,10 +117,6 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
             Terminate = true;
         }
 
-        public Expression<Predicate<Product>> Constraint { get; set; }
-
-        public bool Terminate { get; set; }
-
         public void Invoke(Product product)
         {
             product.Description = "Desktop Computer";
@@ -121,19 +124,12 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
     }
 ```
 
-
-
 #### **UpdateDescriptionAsync Business Rule (Asynchronous)** ####
 
 ```csharp
     //Implement IRuleAsync<T> for asynchronous rules
-    public class UpdateDescriptionAsync : IRuleAsync<Product>
+    public class UpdateDescriptionAsync : RuleAsync<Product>
     {
-
-        public Expression<Predicate<Product>> Constraint { get; set; }
-
-        public bool Terminate { get; set; }
-
         public async Task InvokeAsync(Product product)
         {
             //Simulate API call to external service
@@ -150,12 +146,8 @@ Nuget package available at: [https://www.nuget.org/packages/DotNetRuleEngine/1.0
 #### **UpdateNameAsync Business Rule (Asynchronous)** ####
 
 ```csharp
-    public class UpdateNameAsync : IRuleAsync<Product>
+    public class UpdateNameAsync : RuleAsync<Product>
     {
-        public Expression<Predicate<Product>> Constraint { get; set; }
-
-        public bool Terminate { get; set; }
-
         public async Task InvokeAsync(Product product)
         {
             //Simulate API call to external service

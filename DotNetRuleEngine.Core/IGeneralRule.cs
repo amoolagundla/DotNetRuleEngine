@@ -6,6 +6,9 @@ namespace DotNetRuleEngine.Core
     public interface IGeneralRule<T> where T : class, new()
     {
         Expression<Predicate<T>> Constraint { get; set; }
+
         bool Terminate { get; set; }
+
+        bool Skip { get; set; }
     }
 }

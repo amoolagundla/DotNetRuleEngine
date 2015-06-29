@@ -40,6 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NestedRule.cs" />
+    <Compile Include="NestedRuleAsync.cs" />
+    <Compile Include="Rule.cs" />
+    <Compile Include="RuleAsync.cs" />
     <Compile Include="RuleEngine.cs" />
     <Compile Include="RuleEngineExecutor.cs" />
     <Compile Include="IGeneralRule.cs" />

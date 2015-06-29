@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -47,7 +48,14 @@ namespace DotNetRuleEngine.Core
                 {
                     if (Constrained(asyncRule.Constraint))
                     {
-                        await asyncRule.InvokeAsync(Instance);
+                        await ExecuteBeforeInvokeAsyncEvent(asyncRule);
+
+                        if (!asyncRule.Skip)
+                        {
+                            await asyncRule.InvokeAsync(Instance);                            
+                        }
+
+                        await ExecuteAfterInvokeAsyncEvent(asyncRule);
                     }
                     if (asyncRule.Terminate)
                     {
@@ -67,13 +75,62 @@ namespace DotNetRuleEngine.Core
                 {
                     if (Constrained(rule.Constraint))
                     {
-                        rule.Invoke(Instance);
+                        ExecuteBeforeInvokeEvent(rule);
+
+                        if (!rule.Skip)
+                        {
+                            rule.Invoke(Instance);
+                        }
+
+                        ExecuteAfterInvokeEvent(rule);
                     }
                     if (rule.Terminate)
                     {
                         break;
                     }
                 }
+            }
+        }
+
+        private void InvokeRule(IGeneralRule<T> rule)
+        {
+            
+        }
+
+
+        private void ExecuteAfterInvokeEvent(IGeneralRule<T> rule)
+        {
+            var tmp = rule as Rule<T>;
+            if (tmp != null)
+            {
+                tmp.AfterInvoke();
+            }
+        }
+
+        private void ExecuteBeforeInvokeEvent(IGeneralRule<T> rule)
+        {
+            var tmp = rule as Rule<T>;
+            if (tmp != null)
+            {
+                tmp.BeforeInvoke();
+            }
+        }
+
+        private async Task ExecuteAfterInvokeAsyncEvent(IGeneralRule<T> rule)
+        {
+            var tmp = rule as RuleAsync<T>;
+            if (tmp != null)
+            {
+                await tmp.AfterInvokeAsync();
+            }
+        }
+
+        private async Task ExecuteBeforeInvokeAsyncEvent(IGeneralRule<T> rule)
+        {
+            var tmp = rule as RuleAsync<T>;
+            if (tmp != null)
+            {
+                await tmp.BeforeInvokeAsync();
             }
         }
 
