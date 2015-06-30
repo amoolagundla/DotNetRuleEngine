@@ -125,7 +125,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ###### **UpdateDescription *Rule* (Synchronous)** ######
     
 ```csharp
-    //Implement IRule<T> for synchronous rules
+    //Implement Rule<T> for synchronous rules
 	public class UpdateDescription : Rule<Product>
     {
         public override void Invoke(Product product)
@@ -138,7 +138,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ###### **UpdateDescriptionAsync *Rule* (Asynchronous)** ######
 
 ```csharp
-    //Implement IRuleAsync<T> for asynchronous rules
+    //Implement RuleAsync<T> for asynchronous rules
     public class UpdateDescriptionAsync : RuleAsync<Product>
     {
         public override async Task InvokeAsync(Product product)
