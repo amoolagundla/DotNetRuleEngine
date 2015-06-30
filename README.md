@@ -125,7 +125,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ###### **UpdateDescription *Rule* (Synchronous)** ######
     
 ```csharp
-    //Implement Rule<T> for synchronous rules
+    //Inherit from Rule<T> for synchronous rules
 	public class UpdateDescription : Rule<Product>
     {
         public override void Invoke(Product product)
@@ -138,7 +138,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ###### **UpdateDescriptionAsync *Rule* (Asynchronous)** ######
 
 ```csharp
-    //Implement RuleAsync<T> for asynchronous rules
+    //Inherit from RuleAsync<T> for asynchronous rules
     public class UpdateDescriptionAsync : RuleAsync<Product>
     {
         public override async Task InvokeAsync(Product product)
@@ -172,7 +172,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 
 ##### NestedRule/NestedRuleAsync #####
 
-Rules can be nested. Means a rule can contain other rules. Derive from NestedRule or NestedRuleAsync to implement nested rules.
+Rules can be nested. Derive from NestedRule or NestedRuleAsync to implement nested rules.
 
 ###### Example ######
 ```csharp
@@ -199,7 +199,7 @@ Rules can be nested. Means a rule can contain other rules. Derive from NestedRul
 ```
 
 ##### Before/After Invoke #####
-Rules have Before and After Invoke methods. These methods get invoked before and after the Invoke method as their name indicates.
+Rules have Before and After Invoke methods. They invoked before and after the Invoke method as their name indicates.
 
 ###### Example ######
 ```csharp
@@ -215,13 +215,13 @@ Rules have Before and After Invoke methods. These methods get invoked before and
             }
         }
 
-		//Runs before the Invoke method
+		//Runs before Invoke method
         public override void BeforeInvoke()
         {
 			_stopwatch = Stopwatch.StartNew();
         }
 
-		//Runs after the Invoke method
+		//Runs after Invoke method
         public override void AfterInvoke()
         {
             var totalRuntimeMs = _stopwatch.ElapsedMilliseconds;
@@ -230,7 +230,7 @@ Rules have Before and After Invoke methods. These methods get invoked before and
 ```
 
 ##### Skip #####
-You can mark any rule to be skipped by setting Skip = true. Setting it inside the Invoke method will be ignored.
+You can mark any rule to be skipped by setting Skip = true. *Must be set before Invoke method executed.*
 
 ###### Example ######
 ```csharp
@@ -244,7 +244,6 @@ You can mark any rule to be skipped by setting Skip = true. Setting it inside th
             }
         }
 
-		//Runs before the Invoke method
         public override void BeforeInvoke()
         {
 			Skip = true;
@@ -253,7 +252,7 @@ You can mark any rule to be skipped by setting Skip = true. Setting it inside th
 ```
 
 ##### Terminate #####
-At anytime you can terminate executing the remaining business rules by setting Terminate = true
+You can terminate execution of the remaining rules by setting Terminate = true
 
 ###### Example ######
 ```csharp
@@ -267,8 +266,7 @@ At anytime you can terminate executing the remaining business rules by setting T
             }
         }
 
-		//Runs before the Invoke method
-        public override void BeforeInvoke()
+        public override void AfterInvoke()
         {
 			Terminate = true;
         }
@@ -276,7 +274,7 @@ At anytime you can terminate executing the remaining business rules by setting T
 ```
 
 ##### Constraint #####
-If Constraint property evaluated to false condition, Invoke method will not be executed. Setting it inside the Invoke method will be ignored.
+If Constraint property evaluated to false, Invoke method will not be executed. *Must be set before Invoke method executed.*
 
 ###### Example ######
 ```csharp
@@ -290,7 +288,6 @@ If Constraint property evaluated to false condition, Invoke method will not be e
             }
         }
 
-		//Runs before the Invoke method
         public override void BeforeInvoke()
         {
 			Constraint = order => order.Amount > 1000;
@@ -299,7 +296,7 @@ If Constraint property evaluated to false condition, Invoke method will not be e
 ```
 
 ##### TryAdd/TryGet #####
-If Constraint property evaluated to false condition, Invoke method will not be executed. Setting it inside the Invoke method will be ignored.
+Share data between rules.
 
 ###### Example ######
 ```csharp
