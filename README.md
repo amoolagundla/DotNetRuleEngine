@@ -222,7 +222,7 @@ Rules have Before and After Invoke methods. These methods get invoked before and
         }
 
 		//Runs after the Invoke method
-        public override void AfterInvoke(Order order)
+        public override void AfterInvoke()
         {
             var totalRuntimeMs = _stopwatch.ElapsedMilliseconds;
         }
