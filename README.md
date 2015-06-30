@@ -39,7 +39,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     ruleEngineExecutor.ExecuteAsync();
 ```
 
-##### **Order (domain model)** #####
+###### **Order (domain model)** ######
 
 ```csharp
     public class Order
@@ -48,7 +48,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	}
 ```
 
-##### **IsValidAmount *Rule* (Synchronous)** #####
+###### **IsValidAmount *Rule* (Synchronous)** ######
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
@@ -62,15 +62,15 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     }
 ```
 
-##### **IsValidAmountAsync *Rule* (Asynchronous)** #####
+###### **IsValidAmountAsync *Rule* (Asynchronous)** ######
 ```csharp
     public class IsValidAmountAsync : RuleAsync<Order>
     {   
         public override async Task Invoke(Order order)
         {
             //Simulate API call to external service
-
 			await Task.Delay(10);
+
             if (order.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
@@ -110,7 +110,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	await p.ExecuteAsync();
 ```
 
-##### **Product (domain model)** #####
+###### **Product (domain model)** ######
 
 ```csharp
     //Inherit your model from RuleEngine<T>
@@ -122,7 +122,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	}
 ```
  
-##### **UpdateDescription *Rule* (Synchronous)** #####
+###### **UpdateDescription *Rule* (Synchronous)** ######
     
 ```csharp
     //Implement IRule<T> for synchronous rules
@@ -135,7 +135,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     }
 ```
 
-##### **UpdateDescriptionAsync *Rule* (Asynchronous)** #####
+###### **UpdateDescriptionAsync *Rule* (Asynchronous)** ######
 
 ```csharp
     //Implement IRuleAsync<T> for asynchronous rules
@@ -151,7 +151,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     }
 ```
 
-##### **UpdateNameAsync *Rule* (Asynchronous)** #####
+###### **UpdateNameAsync *Rule* (Asynchronous)** ######
 
 ```csharp
     public class UpdateNameAsync : RuleAsync<Product>
