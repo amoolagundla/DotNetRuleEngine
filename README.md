@@ -128,7 +128,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     //Implement IRule<T> for synchronous rules
 	public class UpdateDescription : Rule<Product>
     {
-        public void Invoke(Product product)
+        public override void Invoke(Product product)
         {
             product.Description = "Desktop Computer";
         }
@@ -141,7 +141,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     //Implement IRuleAsync<T> for asynchronous rules
     public class UpdateDescriptionAsync : RuleAsync<Product>
     {
-        public async Task InvokeAsync(Product product)
+        public override async Task InvokeAsync(Product product)
         {
             //Simulate API call to external service
             await Task.Delay(10);
@@ -156,7 +156,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ```csharp
     public class UpdateNameAsync : RuleAsync<Product>
     {
-        public async Task InvokeAsync(Product product)
+        public override async Task InvokeAsync(Product product)
         {
             //Simulate API call to external service
             await Task.Delay(10);
@@ -178,7 +178,7 @@ Rules can be nested. Means a rule can contain other rules. Derive from NestedRul
 ```csharp
     public class IsValidAmount : NestedRule<Order>
     {   
-        public void Invoke(Order order)
+        public override void Invoke(Order order)
         {
             AddRules(new AmountGreaterThan1000());
 			Execute();
@@ -188,7 +188,7 @@ Rules can be nested. Means a rule can contain other rules. Derive from NestedRul
 ```csharp
     public class AmountGreaterThan1000 : Rule<Order>
     {   
-        public void Invoke(Order order)
+        public override void Invoke(Order order)
         {
             if (order.Amount > 1000)
             {
@@ -207,7 +207,7 @@ Rules have Before and After Invoke methods. These methods get invoked before and
     {   
         private Stopwatch _stopwatch;
 
-        public void Invoke(Order order)
+        public override void Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
@@ -236,7 +236,7 @@ You can mark any rule to be skipped by setting Skip = true. Setting it inside th
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public void Invoke(Order order)
+        public override void Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
@@ -259,7 +259,7 @@ At anytime you can terminate executing the remaining business rules by setting T
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public void Invoke(Order order)
+        public override void Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
@@ -282,7 +282,7 @@ If Constraint property evaluated to false condition, Invoke method will not be e
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public void Invoke(Order order)
+        public override void Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
@@ -305,7 +305,7 @@ If Constraint property evaluated to false condition, Invoke method will not be e
 ```csharp
     public class UpdateDescription : Rule<Product>
     {
-        public void Invoke(Product product)
+        public override void Invoke(Product product)
         {
             //Store data to share with the other rules
             product.TryAdd("Description", "Desktop Computer");
@@ -315,7 +315,7 @@ If Constraint property evaluated to false condition, Invoke method will not be e
 ```csharp
     public class UpdateName : Rule<Product>
     {
-        public void Invoke(Product product)
+        public override void Invoke(Product product)
         {
             //Rerieve data stored by another business rule
             var description = product.TryGetValue("Description");
