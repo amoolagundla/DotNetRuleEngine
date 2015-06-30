@@ -19,7 +19,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ```csharp
 	Order order = new Order { Amount = 10.99m };
 
-    RuleEngineExecutor<Order> ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
+    var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmount());
    
     ruleEngineExecutor.Execute();
@@ -31,7 +31,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ```csharp
 	Order order = new Order { Amount = 10.99m };
 
-    RuleEngineExecutor<Order> ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
+    var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmountAsync());
     
     ruleEngineExecutor.ExecuteAsync();
