@@ -317,7 +317,7 @@ If Constraint property evaluated to false condition, Invoke method will not be e
     {
         public override void Invoke(Product product)
         {
-            //Rerieve data stored by another business rule
+            //Rerieve data from another rule
             var description = product.TryGetValue("Description");
         }
     }
