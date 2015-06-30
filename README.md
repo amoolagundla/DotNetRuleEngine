@@ -12,8 +12,6 @@
 Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.1.0 "DotNetRuleEngine")
 
 
-**Usage:**
-
 #### **RuleEngineExecutor API:** ####
 
 ##### **Synchronous:** #####
@@ -199,7 +197,7 @@ Rules can be nested. Derive from NestedRule or NestedRuleAsync to implement nest
 ```
 
 ##### Before/After Invoke #####
-Rules have Before and After Invoke methods. They invoked before and after the Invoke method as their name indicates.
+They're invoked before and after the Invoke method.
 
 ###### Example ######
 ```csharp
@@ -230,7 +228,7 @@ Rules have Before and After Invoke methods. They invoked before and after the In
 ```
 
 ##### Skip #####
-You can mark any rule to be skipped by setting Skip = true. *Must be set before Invoke method executed.*
+Mark any rule to be skipped by setting Skip = true. *Must be set before Invoke method executed.*
 
 ###### Example ######
 ```csharp
