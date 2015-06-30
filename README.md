@@ -197,7 +197,7 @@ Rules can be nested. Derive from NestedRule or NestedRuleAsync to implement nest
 ```
 
 ##### Before/After Invoke #####
-They're invoked before and after the Invoke method.
+Executed before and after the Invoke method.
 
 ###### Example ######
 ```csharp
@@ -228,7 +228,7 @@ They're invoked before and after the Invoke method.
 ```
 
 ##### Skip #####
-Mark any rule to be skipped by setting Skip = true. *Must be set before Invoke method executed.*
+Marks the rule to be skipped. Invoke method will not be executed. *Must be set before Invoke method executed.*
 
 ###### Example ######
 ```csharp
@@ -250,7 +250,7 @@ Mark any rule to be skipped by setting Skip = true. *Must be set before Invoke m
 ```
 
 ##### Terminate #####
-You can terminate execution of the remaining rules by setting Terminate = true
+Terminates execution of the remaining rules.
 
 ###### Example ######
 ```csharp
@@ -272,7 +272,7 @@ You can terminate execution of the remaining rules by setting Terminate = true
 ```
 
 ##### Constraint #####
-If Constraint property evaluated to false, Invoke method will not be executed. *Must be set before Invoke method executed.*
+If evaluated to false, Invoke method will not be executed. *Must be set before Invoke method executed.*
 
 ###### Example ######
 ```csharp
