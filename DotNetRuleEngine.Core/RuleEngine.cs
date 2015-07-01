@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -48,6 +47,7 @@ namespace DotNetRuleEngine.Core
                 {
                     if (Constrained(asyncRule.Constraint))
                     {
+                        AddRuleAsyncDataValues(asyncRule);
                         await ExecuteBeforeInvokeAsyncEvent(asyncRule);
 
                         if (!asyncRule.Skip)
@@ -75,6 +75,7 @@ namespace DotNetRuleEngine.Core
                 {
                     if (Constrained(rule.Constraint))
                     {
+                        AddRuleDataValues(rule);
                         ExecuteBeforeInvokeEvent(rule);
 
                         if (!rule.Skip)
@@ -92,11 +93,17 @@ namespace DotNetRuleEngine.Core
             }
         }
 
-        private void InvokeRule(IGeneralRule<T> rule)
+        private void AddRuleDataValues(IGeneralRule<T> rule)
         {
-            
+            var tmp = rule as Rule<T>;
+            AddToDataCollection(tmp);
         }
 
+        private void AddRuleAsyncDataValues(IGeneralRule<T> rule)
+        {
+            var tmp = rule as RuleAsync<T>;
+            AddToDataCollection(tmp);
+        }
 
         private void ExecuteAfterInvokeEvent(IGeneralRule<T> rule)
         {
@@ -145,6 +152,18 @@ namespace DotNetRuleEngine.Core
         private bool Constrained(Expression<Predicate<T>> predicate)
         {
             return predicate == null || predicate.Compile().Invoke(Instance);
+        }
+
+        private void AddToDataCollection(IGeneralRule<T> tmp)
+        {
+            if (tmp != null)
+            {
+                foreach (var pair in tmp.Data)
+                {
+                    _data.TryAdd(pair.Key, pair.Value);
+                }
+                tmp.Data = _data;
+            }
         }
     }
 }

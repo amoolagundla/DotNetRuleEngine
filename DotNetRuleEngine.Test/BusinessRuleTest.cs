@@ -25,9 +25,9 @@ namespace DotNetRuleEngine.Test
            
             p.Execute();
 
-            var productName = p.TryGetValue("Name");
+            var productName = p.TryGetValue("Key1");
             var productPrice = p.TryGetValue("Price");
-            Assert.AreSame(null, productName);
+            Assert.AreSame("Laptop", productName);
             Assert.AreEqual(3.99m, productPrice);
         }
     }

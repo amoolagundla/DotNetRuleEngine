@@ -6,8 +6,13 @@ namespace DotNetRuleEngine.Test.BusinessRules
     class ValidatePrice : Rule<Product>
     {        
         public override void Invoke(Product product)
-        {
+        {            
             product.TryAdd("Price", 3.99m);
+        }
+
+        public override void BeforeInvoke()
+        {
+            var value = TryGetValue("Key1");
         }
     }
 }

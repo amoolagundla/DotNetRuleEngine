@@ -8,6 +8,7 @@ namespace DotNetRuleEngine.Test.BusinessRules
         public override void BeforeInvoke()
         {
             Constraint = b => b.Name == "Laptop";
+            TryAdd("Key1", "Laptop");
         }
 
         public override void Invoke(Product product)

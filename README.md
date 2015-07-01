@@ -294,7 +294,7 @@ If evaluated to false, Invoke method will not be executed. *Must be set before I
 ```
 
 ##### TryAdd/TryGet #####
-Share data between rules.
+Share data between rules. *If the model is derived from RuleEngine, the TryAdd/TryGetValue methods will be available on the model instance itself.*
 
 ###### Example ######
 ```csharp
@@ -303,7 +303,7 @@ Share data between rules.
         public override void Invoke(Product product)
         {
             //Store data to share with the other rules
-            product.TryAdd("Description", "Desktop Computer");
+            TryAdd("Description", "Desktop Computer");
         }
     }
 ```
@@ -313,7 +313,7 @@ Share data between rules.
         public override void Invoke(Product product)
         {
             //Rerieve data from another rule
-            var description = product.TryGetValue("Description");
+            var description = TryGetValue("Description");
         }
     }
 ```
