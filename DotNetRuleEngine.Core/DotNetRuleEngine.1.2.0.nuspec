@@ -2,24 +2,23 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>DotNetRuleEngine</id>
-        <version>1.1.0</version>
+        <version>1.2.0</version>
         <title>DotNetRuleEngine</title>
         <authors>Arif Yayalar</authors>
         <owners>Arif Yayalar</owners>
         <projectUrl>https://github.com/ayayalar/DotNetRuleEngine</projectUrl>
+        <iconUrl>https://raw.githubusercontent.com/ayayalar/DotNetRuleEngine/master/DotNetRuleEngine.Core/Icon/icon_128.ico</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>DotNetRuleEngine is a Rule Engine that allows you to write sophisticated 
 rules to keep your code clean and structured. Supports both synchronous and asynchronous execution. But most importantly it does this in a very simple and elegant way. You don't need to invest so much of your precious time to learn a whole new framework.</description>
         <summary>Rule Based Software Development</summary>
-        <releaseNotes>Added abstract Rule, NestedRule, RuleAsync, NestedRuleAsync classes. Added Skip property to all rules. Added BeforeInvoke/Async, AfterInvoke
-/Async methods. Documentation updated with examples on all usages.</releaseNotes>
+        <releaseNotes>TryAdd/TryGetValue are now available on Rule/RuleAsync</releaseNotes>
         <copyright>MIT</copyright>
         <language>en-US</language>
         <tags>Business Rule Engine Validation Constraint</tags>
     </metadata>
     <files>
-        <file src="lib\net45\_._" target="lib\net45\_._" />
-        <file src="lib\DotNetRuleEngine.dll" target="lib\DotNetRuleEngine.dll" />
-        <file src="lib\DotNetRuleEngine.pdb" target="lib\DotNetRuleEngine.pdb" />
+        <file src="bin\Debug\DotNetRuleEngine.dll" target="lib\DotNetRuleEngine.dll" />
+        <file src="bin\Debug\DotNetRuleEngine.pdb" target="lib\DotNetRuleEngine.pdb" />
     </files>
 </package>
