@@ -22,7 +22,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmount());
    
-    //null results will not be returned
+    //null rule results will be ignored by execute method.
     IRuleResult[] ruleResults = ruleEngineExecutor.Execute();
 ```
 
@@ -35,25 +35,25 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmountAsync());
     
-    //null results will not be returned
+    //null rule results will be ignored by executeasync method.
     IRuleResult[] ruleResults = await ruleEngineExecutor.ExecuteAsync();
 ```
 
 ###### **IRuleResult** ######
-Return value of Rule/RuleAsync. *Return null to ignore the outcome of the rule*
+The return value of Rule/RuleAsync.
 
 <table>
 <tr>
 <td>Name</td>
-<td>Defaults to class name of the rule.</td>
+<td>Use it to store name of the rule. (Defaults to class name of the rule).</td>
 </tr>
 <tr>
 <td>Result</td>
-<td>Stores the outcome of rule</td>
+<td>Use it to store outcome of the rule.</td>
 </tr>
 <tr>
 <td>Data</td>
-<td>Stores any arbitrary data</td>
+<td>Use it to store any arbitrary data.</td>
 </tr>
 </table>
 
@@ -65,6 +65,8 @@ Return value of Rule/RuleAsync. *Return null to ignore the outcome of the rule*
         Dictionary<string, object> Data { get; set; }
     }
 ```
+
+**RuleResult is the implementation of IRuleResult*
 
 ###### **Order (domain model)** ######
 
@@ -85,7 +87,7 @@ Return value of Rule/RuleAsync. *Return null to ignore the outcome of the rule*
             {
                 throw new InvalidOperationException();
             }
-
+            
             return null;
         }
     }
