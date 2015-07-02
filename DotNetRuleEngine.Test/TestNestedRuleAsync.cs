@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Test.AsyncRules;
 using DotNetRuleEngine.Test.Models;
-using DotNetRuleEngine.Test.Rules;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DotNetRuleEngine.Test

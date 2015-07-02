@@ -8,7 +8,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
     {
         public override async Task<IRuleResult> InvokeAsync(Product product)
         {
-            product.Description = TryGetValue("Description").ToString();
+            product.Description = TryGetValue("Description").To<string>();
             return await Task.FromResult(new RuleResult { Name = "ProductRule", Result = product.Description });
         }
     }

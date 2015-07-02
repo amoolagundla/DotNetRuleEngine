@@ -7,7 +7,7 @@ namespace DotNetRuleEngine.Test.Rules
     {
         public override IRuleResult Invoke(Product product)
         {
-            product.Description = TryGetValue("Description").ToString();
+            product.Description = TryGetValue("Description").To<string>();
             return new RuleResult { Name = "ProductRule", Result = product.Description };
         }
     }
