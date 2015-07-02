@@ -42,6 +42,6 @@ namespace DotNetRuleEngine.Core
             await Task.FromResult<object>(null);
         }
 
-        public abstract Task InvokeAsync(T type);
+        public abstract Task<IRuleResult> InvokeAsync(T type);
     }
 }

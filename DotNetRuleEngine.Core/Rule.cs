@@ -39,6 +39,6 @@ namespace DotNetRuleEngine.Core
         {
         }
 
-        public abstract void Invoke(T type);
+        public abstract IRuleResult Invoke(T type);
     }
 }

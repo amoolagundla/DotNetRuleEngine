@@ -22,7 +22,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmount());
    
-    ruleEngineExecutor.Execute();
+    IRuleResult[] ruleResults = ruleEngineExecutor.Execute();
 ```
 
 
@@ -34,7 +34,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmountAsync());
     
-    ruleEngineExecutor.ExecuteAsync();
+    IRuleResult[] ruleResults = await ruleEngineExecutor.ExecuteAsync();
 ```
 
 ###### **Order (domain model)** ######
@@ -50,12 +50,14 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public override void Invoke(Order order)
+        public override IRuleResult Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
             }
+
+            return null;
         }
     }
 ```
@@ -64,7 +66,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ```csharp
     public class IsValidAmountAsync : RuleAsync<Order>
     {   
-        public override async Task Invoke(Order order)
+        public override async Task<IRuleResult> Invoke(Order order)
         {
             //Simulate API call to external service
 			await Task.Delay(10);
@@ -73,6 +75,8 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
             {
                 throw new InvalidOperationException();
             }
+            
+            return Task.FromResult<object>(null);
         }
     }
 ```
@@ -94,7 +98,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	p.AddRules(new UpdateDescription());
 
     //Execute the rules against the product instance
-	p.Execute();
+	IRuleResult[] ruleResults = p.Execute();
 ```
 
 ##### **Asynchronous** #####
@@ -105,7 +109,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 	p.AddRules(new UpdateDescriptionAsync(),
                new UpdateNameAsync());
 
-	await p.ExecuteAsync();
+	IRuleResult[] ruleResults = await p.ExecuteAsync();
 ```
 
 ###### **Product (domain model)** ######
@@ -126,9 +130,11 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     //Inherit from Rule<T> for synchronous rules
 	public class UpdateDescription : Rule<Product>
     {
-        public override void Invoke(Product product)
+        public override IRuleResult Invoke(Product product)
         {
             product.Description = "Desktop Computer";
+
+			return null; 
         }
     }
 ```
@@ -139,12 +145,14 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     //Inherit from RuleAsync<T> for asynchronous rules
     public class UpdateDescriptionAsync : RuleAsync<Product>
     {
-        public override async Task InvokeAsync(Product product)
+        public override async Task<IRuleResult> InvokeAsync(Product product)
         {
             //Simulate API call to external service
             await Task.Delay(10);
 
             product.Description = "Desktop Computer";
+
+            return Task.FromResult<object>(null);
         }
     }
 ```
@@ -154,12 +162,14 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 ```csharp
     public class UpdateNameAsync : RuleAsync<Product>
     {
-        public override async Task InvokeAsync(Product product)
+        public override async Task<IRuleResult> InvokeAsync(Product product)
         {
             //Simulate API call to external service
             await Task.Delay(10);
 
             product.Name = "Dell Inspiron";
+
+            return Task.FromResult<object>(null);
         }
     }
 ```
@@ -176,22 +186,27 @@ Rules can be nested. Derive from NestedRule or NestedRuleAsync to implement nest
 ```csharp
     public class IsValidAmount : NestedRule<Order>
     {   
-        public override void Invoke(Order order)
+        public override IRuleResult Invoke(Order order)
         {
+            Instance = order;
             AddRules(new AmountGreaterThan1000());
-			Execute();
+			ruleResults = Execute();
+
+            return new RuleResult { Result = ruleResult };
         }
     }
 ```
 ```csharp
     public class AmountGreaterThan1000 : Rule<Order>
     {   
-        public override void Invoke(Order order)
+        public override IRuleResult Invoke(Order order)
         {
             if (order.Amount > 1000)
             {
                 order.Shipping = 5;
             }
+            
+            return null;
         }
     }
 ```
@@ -205,12 +220,14 @@ Executed before and after the Invoke method.
     {   
         private Stopwatch _stopwatch;
 
-        public override void Invoke(Order order)
+        public override IRuleResult Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
             }
+
+            return null;
         }
 
 		//Runs before Invoke method
@@ -234,12 +251,14 @@ Marks the rule to be skipped. Invoke method will not be executed. *Must be set b
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public override void Invoke(Order order)
+        public override IRuleResult Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
             }
+
+            return null;
         }
 
         public override void BeforeInvoke()
@@ -256,12 +275,14 @@ Terminates execution of the remaining rules.
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public override void Invoke(Order order)
+        public override IRuleResult Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
             }
+
+            return null;
         }
 
         public override void AfterInvoke()
@@ -278,12 +299,13 @@ If evaluated to false, Invoke method will not be executed. *Must be set before I
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public override void Invoke(Order order)
+        public override IRuleResult Invoke(Order order)
         {
             if (order.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
             }
+
         }
 
         public override void BeforeInvoke()
@@ -300,20 +322,24 @@ Share data between rules. *If the model is derived from RuleEngine, the TryAdd/T
 ```csharp
     public class UpdateDescription : Rule<Product>
     {
-        public override void Invoke(Product product)
+        public override IRuleResult Invoke(Product product)
         {
             //Store data to share with the other rules
             TryAdd("Description", "Desktop Computer");
+
+            return null;
         }
     }
 ```
 ```csharp
     public class UpdateName : Rule<Product>
     {
-        public override void Invoke(Product product)
+        public override IRuleResult Invoke(Product product)
         {
             //Rerieve data from another rule
             var description = TryGetValue("Description");
+ 
+            return null;
         }
     }
 ```

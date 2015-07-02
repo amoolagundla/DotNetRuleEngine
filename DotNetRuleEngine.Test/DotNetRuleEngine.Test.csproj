@@ -50,27 +50,40 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="BusinessRules\EnsureProductNameIsNotNull.cs" />
-    <Compile Include="BusinessRules\IsValidAmount.cs" />
-    <Compile Include="BusinessRules\IsValidAmountAsync.cs" />
-    <Compile Include="BusinessRules\ValidatePrice.cs" />
-    <Compile Include="BusinessRules\ValidateNameWithConstraint.cs" />
-    <Compile Include="NestedBusinessRuleTest.cs" />
-    <Compile Include="BusinessRules\ProductValidation.cs" />
-    <Compile Include="TestAsyncBusinessRule.cs" />
+    <Compile Include="Models\Product.cs" />
+    <Compile Include="Rules\ProductAfterInvokeA.cs" />
+    <Compile Include="Rules\ProductAfterInvokeB.cs" />
+    <Compile Include="Rules\ProductConstraintA.cs" />
+    <Compile Include="AsyncRules\ProductConstraintAsyncA.cs" />
+    <Compile Include="AsyncRules\ProductConstraintAsyncB.cs" />
+    <Compile Include="Rules\ProductConstraintB.cs" />
+    <Compile Include="Rules\ProductNestedRule.cs" />
+    <Compile Include="Rules\ProductNestedRuleA.cs" />
+    <Compile Include="AsyncRules\ProductNestedRuleAsync.cs" />
+    <Compile Include="AsyncRules\ProductNestedRuleAsyncA.cs" />
+    <Compile Include="AsyncRules\ProductNestedRuleAsyncB.cs" />
+    <Compile Include="AsyncRules\ProductNestedRuleAsyncC.cs" />
+    <Compile Include="Rules\ProductNestedRuleB.cs" />
+    <Compile Include="Rules\ProductNestedRuleC.cs" />
+    <Compile Include="Rules\ProductRule.cs" />
+    <Compile Include="AsyncRules\ProductRuleAsync.cs" />
+    <Compile Include="Rules\ProductSkip.cs" />
+    <Compile Include="AsyncRules\ProductSkipAsync.cs" />
+    <Compile Include="Rules\ProductTerminateA.cs" />
+    <Compile Include="AsyncRules\ProductTerminateAsyncA.cs" />
+    <Compile Include="AsyncRules\ProductTerminateAsyncB.cs" />
+    <Compile Include="Rules\ProductTerminateB.cs" />
+    <Compile Include="Rules\ProductTryAdd.cs" />
+    <Compile Include="AsyncRules\ProductTryAddAsync.cs" />
+    <Compile Include="Rules\ProductTryGetValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BusinessRuleTest.cs" />
-    <Compile Include="BusinessRules\ValidateName.cs" />
-    <Compile Include="BusinessRules\ValidateDescription.cs" />
-    <Compile Include="BusinessRules\UpdateProductNameAsync.cs" />
-    <Compile Include="BusinessRules\UpdateProductDescriptionAsync.cs" />
-    <Compile Include="RuleEngineExecutorTest.cs" />
+    <Compile Include="AsyncRules\ProductTryGetValueAsync.cs" />
+    <Compile Include="TestRule.cs" />
+    <Compile Include="TestRuleAsync.cs" />
+    <Compile Include="TestNestedRule.cs" />
+    <Compile Include="TestNestedRuleAsync.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DotNetRuleEngine.Model\DotNetRuleEngine.Model.csproj">
-      <Project>{0C02A58D-291A-434E-A09B-56D71FF57461}</Project>
-      <Name>DotNetRuleEngine.Model</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DotNetRuleEngine.Core\DotNetRuleEngine.Core.csproj">
       <Project>{341DAB80-DB57-49C5-A0D8-1719C576620E}</Project>
       <Name>DotNetRuleEngine.Core</Name>

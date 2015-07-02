@@ -10,6 +10,8 @@ namespace DotNetRuleEngine.Core
     public abstract class RuleEngine<T> where T : class, new()
     {
         private readonly ConcurrentDictionary<string, object> _data = new ConcurrentDictionary<string, object>();
+        private readonly IList<IRuleResult> _ruleResults = new List<IRuleResult>();
+        private readonly IList<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
 
         protected RuleEngine()
         {
@@ -20,24 +22,12 @@ namespace DotNetRuleEngine.Core
 
         protected IList<IGeneralRule<T>> Rules { get; private set; }
 
-        public object TryGetValue(string key)
-        {
-            object name;
-
-            return _data.TryGetValue(key, out name) ? name : null;
-        }
-
-        public bool TryAdd(string key, object value)
-        {
-            return _data.TryAdd(key, value);
-        }
-
         public virtual void AddRules(params IGeneralRule<T>[] rules)
         {
             Rules = rules.ToList();
         }
 
-        public virtual async Task ExecuteAsync()
+        public virtual async Task<IRuleResult[]> ExecuteAsync()
         {
             ValidateInstance();
 
@@ -45,27 +35,32 @@ namespace DotNetRuleEngine.Core
             {
                 foreach (var asyncRule in Rules.OfType<IRuleAsync<T>>())
                 {
-                    if (Constrained(asyncRule.Constraint))
+                    AddRuleAsyncDataValues(asyncRule);
+                    await asyncRule.BeforeInvokeAsync();
+
+                    if (!asyncRule.Skip && Constrained(asyncRule.Constraint))
                     {
-                        AddRuleAsyncDataValues(asyncRule);
-                        await ExecuteBeforeInvokeAsyncEvent(asyncRule);
-
-                        if (!asyncRule.Skip)
+                        var ruleResult = await asyncRule.InvokeAsync(Instance);
+                        if (ruleResult != null)
                         {
-                            await asyncRule.InvokeAsync(Instance);                            
+                            _asyncRuleResults.Add(ruleResult);
                         }
-
-                        await ExecuteAfterInvokeAsyncEvent(asyncRule);
                     }
+
+                    await asyncRule.AfterInvokeAsync();
+                    AddRuleAsyncDataValues(asyncRule);
+
                     if (asyncRule.Terminate)
                     {
                         break;
                     }
                 }
             }
+
+            return _asyncRuleResults.ToArray();
         }
 
-        public virtual void Execute()
+        public virtual IRuleResult[] Execute()
         {
             ValidateInstance();
 
@@ -73,72 +68,39 @@ namespace DotNetRuleEngine.Core
             {
                 foreach (var rule in Rules.OfType<IRule<T>>())
                 {
-                    if (Constrained(rule.Constraint))
+                    AddRuleDataValues(rule);
+                    rule.BeforeInvoke();
+
+                    if (!rule.Skip && Constrained(rule.Constraint))
                     {
-                        AddRuleDataValues(rule);
-                        ExecuteBeforeInvokeEvent(rule);
-
-                        if (!rule.Skip)
+                        var ruleResult = rule.Invoke(Instance);
+                        if (ruleResult != null)
                         {
-                            rule.Invoke(Instance);
+                            _ruleResults.Add(ruleResult);
                         }
-
-                        ExecuteAfterInvokeEvent(rule);
                     }
+
+                    rule.AfterInvoke();
+                    AddRuleDataValues(rule);
+
                     if (rule.Terminate)
                     {
                         break;
                     }
                 }
             }
+
+            return _ruleResults.ToArray();
         }
 
         private void AddRuleDataValues(IGeneralRule<T> rule)
         {
-            var tmp = rule as Rule<T>;
-            AddToDataCollection(tmp);
+            AddToDataCollection(rule);
         }
 
         private void AddRuleAsyncDataValues(IGeneralRule<T> rule)
         {
-            var tmp = rule as RuleAsync<T>;
-            AddToDataCollection(tmp);
-        }
-
-        private void ExecuteAfterInvokeEvent(IGeneralRule<T> rule)
-        {
-            var tmp = rule as Rule<T>;
-            if (tmp != null)
-            {
-                tmp.AfterInvoke();
-            }
-        }
-
-        private void ExecuteBeforeInvokeEvent(IGeneralRule<T> rule)
-        {
-            var tmp = rule as Rule<T>;
-            if (tmp != null)
-            {
-                tmp.BeforeInvoke();
-            }
-        }
-
-        private async Task ExecuteAfterInvokeAsyncEvent(IGeneralRule<T> rule)
-        {
-            var tmp = rule as RuleAsync<T>;
-            if (tmp != null)
-            {
-                await tmp.AfterInvokeAsync();
-            }
-        }
-
-        private async Task ExecuteBeforeInvokeAsyncEvent(IGeneralRule<T> rule)
-        {
-            var tmp = rule as RuleAsync<T>;
-            if (tmp != null)
-            {
-                await tmp.BeforeInvokeAsync();
-            }
+            AddToDataCollection(rule);
         }
 
         private void ValidateInstance()

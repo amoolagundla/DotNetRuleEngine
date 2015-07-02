@@ -6,12 +6,14 @@ namespace DotNetRuleEngine.Demo.BusinessRules
 {
     public class ChangeNameAsync : RuleAsync<Product>
     {
-        public override async Task InvokeAsync(Product product)
+        public override async Task<IRuleResult> InvokeAsync(Product product)
         {
             await Task.Delay(100);
             product.Name = "PC";
 
-            product.TryAdd("ChangeNameAsync", "PC");
+            TryAdd("ChangeNameAsync", "PC");
+
+            return null;
         }
     }
 }
