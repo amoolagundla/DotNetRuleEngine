@@ -43,6 +43,10 @@ namespace DotNetRuleEngine.Core
                         var ruleResult = await asyncRule.InvokeAsync(Instance);
                         if (ruleResult != null)
                         {
+                            if (string.IsNullOrWhiteSpace(ruleResult.Name))
+                            {
+                                ruleResult.Name = asyncRule.GetType().Name;
+                            }
                             _asyncRuleResults.Add(ruleResult);
                         }
                     }
@@ -76,6 +80,10 @@ namespace DotNetRuleEngine.Core
                         var ruleResult = rule.Invoke(Instance);
                         if (ruleResult != null)
                         {
+                            if (string.IsNullOrWhiteSpace(ruleResult.Name))
+                            {
+                                ruleResult.Name = rule.GetType().Name;
+                            }
                             _ruleResults.Add(ruleResult);
                         }
                     }

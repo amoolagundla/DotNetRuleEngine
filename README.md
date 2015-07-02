@@ -22,6 +22,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmount());
    
+    //null results will not be returned
     IRuleResult[] ruleResults = ruleEngineExecutor.Execute();
 ```
 
@@ -34,7 +35,35 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmountAsync());
     
+    //null results will not be returned
     IRuleResult[] ruleResults = await ruleEngineExecutor.ExecuteAsync();
+```
+
+###### **IRuleResult** ######
+Return value of Rule/RuleAsync. *Return null to ignore the outcome of the rule*
+
+<table>
+<tr>
+<td>Name</td>
+<td>Defaults to class name of the rule.</td>
+</tr>
+<tr>
+<td>Result</td>
+<td>Stores the outcome of rule</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>Stores any arbitrary data</td>
+</tr>
+</table>
+
+```csharp
+    public interface IRuleResult
+    {
+        string Name { get; set; }
+        object Result { get; set; }
+        Dictionary<string, object> Data { get; set; }
+    }
 ```
 
 ###### **Order (domain model)** ######
