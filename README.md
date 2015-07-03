@@ -347,7 +347,7 @@ If evaluated to false, Invoke method will not be executed. *Must be set before I
 ```
 
 ##### TryAdd/TryGet #####
-Share data between rules. *If the model is derived from RuleEngine, the TryAdd/TryGetValue methods will be available on the model instance itself.*
+Share data between rules.
 
 ###### Example ######
 ```csharp
