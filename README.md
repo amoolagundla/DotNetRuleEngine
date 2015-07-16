@@ -22,7 +22,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmount());
    
-    //Null rule results will be ignored by execute method.
+    //Null rule results will be ignored by Execute method.
     IRuleResult[] ruleResults = ruleEngineExecutor.Execute();
 ```
 
@@ -35,7 +35,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmountAsync());
     
-    //Null rule results will be ignored by executeasync method.
+    //Null rule results will be ignored by ExecuteAsync method.
     IRuleResult[] ruleResults = await ruleEngineExecutor.ExecuteAsync();
 ```
 
