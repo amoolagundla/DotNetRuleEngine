@@ -14,28 +14,34 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 
 #### **RuleEngineExecutor API:** ####
 
-##### **Synchronous:** #####
+##### **Synchronous Example:** #####
 
 ```csharp
-	Order order = new Order { Amount = 10.99m };
 
+    //New up your model
+    Order order = new Order { Amount = 10.99m };
+
+    //Add rules to run against the model instance
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmount());
    
-    //Null rule results will be ignored by Execute method.
+    //Execute the rules. (Null rule results will be ignored by Execute method)
     IRuleResult[] ruleResults = ruleEngineExecutor.Execute();
 ```
 
 
-##### **Asynchronous:** #####
+##### **Asynchronous Example:** #####
 
 ```csharp
-	Order order = new Order { Amount = 10.99m };
+    
+    //New up your model
+    Order order = new Order { Amount = 10.99m };
 
+    //Add rules to run against the model instance
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmountAsync());
     
-    //Null rule results will be ignored by ExecuteAsync method.
+    //Execute the rules. (Null rule results will be ignored by Execute method)
     IRuleResult[] ruleResults = await ruleEngineExecutor.ExecuteAsync();
 ```
 
@@ -45,15 +51,15 @@ The return value of Rule/RuleAsync.
 <table>
 <tr>
 <td>Name</td>
-<td>Use it to store name of the rule. (Defaults to class name of the rule).</td>
+<td>Used to store name of the rule. (Defaults to class name of the rule).</td>
 </tr>
 <tr>
 <td>Result</td>
-<td>Use it to store outcome of the rule.</td>
+<td>Used to store outcome of the rule.</td>
 </tr>
 <tr>
 <td>Data</td>
-<td>Use it to store any arbitrary data.</td>
+<td>Used to store any arbitrary data.</td>
 </tr>
 </table>
 
