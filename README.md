@@ -125,28 +125,33 @@ The return value of Rule/RuleAsync.
 
 #### **RuleEngine API** ####
 
-##### **Synchronous** #####
+##### **Synchronous Example:** #####
 
 ```csharp
-	//Create an instance of your model
+    
+    //New up your model
     Product p = new Product();
 
-    //Add rule(s)
-	p.AddRules(new UpdateDescription());
+    //Add rules to run against the model instance
+    p.AddRules(new UpdateDescription());
 
-    //Execute the rules against the product instance
-	IRuleResult[] ruleResults = p.Execute();
+    //Execute the rules. (Null rule results will be ignored by Execute method)
+    IRuleResult[] ruleResults = p.Execute();
 ```
 
-##### **Asynchronous** #####
+##### **Asynchronous Example:** #####
 
 ```csharp
+
+    //New up your model
     Product p = new Product();
     
-	p.AddRules(new UpdateDescriptionAsync(),
+    //Add rules to run against the model instance
+    p.AddRules(new UpdateDescriptionAsync(),
                new UpdateNameAsync());
 
-	IRuleResult[] ruleResults = await p.ExecuteAsync();
+    //Execute the rules. (Null rule results will be ignored by Execute method)
+    IRuleResult[] ruleResults = await p.ExecuteAsync();
 ```
 
 ###### **Product (domain model)** ######
