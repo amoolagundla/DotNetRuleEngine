@@ -14,6 +14,17 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 
 #### **RuleEngineExecutor API:** ####
 
+**Examples:**
+
+###### **Order (domain model)** ######
+
+```csharp
+    public class Order
+	{
+		public decimal Amount { get; set; }
+	}
+```
+
 ##### **Synchronous Example:** #####
 
 ```csharp
@@ -25,8 +36,24 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmount());
    
-    //Execute the rules. (Null rule results will be ignored by Execute method)
+    //Execute the rules
     IRuleResult[] ruleResults = ruleEngineExecutor.Execute();
+```
+
+###### **IsValidAmount *Rule* (Synchronous)** ######
+```csharp
+    public class IsValidAmount : Rule<Order>
+    {   
+        public override IRuleResult Invoke(Order order)
+        {
+            if (order.Amount <= 0.0m)
+            {
+                throw new InvalidOperationException();
+            }
+            
+            return null;
+        }
+    }
 ```
 
 
@@ -41,8 +68,27 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
     ruleEngineExecutor.AddRules(new IsValidAmountAsync());
     
-    //Execute the rules. (Null rule results will be ignored by Execute method)
+    //Execute the rules
     IRuleResult[] ruleResults = await ruleEngineExecutor.ExecuteAsync();
+```
+
+###### **IsValidAmountAsync *Rule* (Asynchronous)** ######
+```csharp
+    public class IsValidAmountAsync : RuleAsync<Order>
+    {   
+        public override async Task<IRuleResult> Invoke(Order order)
+        {
+            //Simulate API call to external service
+			await Task.Delay(10);
+
+            if (order.Amount <= 0.0m)
+            {
+                throw new InvalidOperationException();
+            }
+            
+            return Task.FromResult<object>(null);
+        }
+    }
 ```
 
 ###### **IRuleResult** ######
@@ -73,50 +119,6 @@ The return value of Rule/RuleAsync.
 ```
 
 **RuleResult is the implementation of IRuleResult*
-
-###### **Order (domain model)** ######
-
-```csharp
-    public class Order
-	{
-		public decimal Amount { get; set; }
-	}
-```
-
-###### **IsValidAmount *Rule* (Synchronous)** ######
-```csharp
-    public class IsValidAmount : Rule<Order>
-    {   
-        public override IRuleResult Invoke(Order order)
-        {
-            if (order.Amount <= 0.0m)
-            {
-                throw new InvalidOperationException();
-            }
-            
-            return null;
-        }
-    }
-```
-
-###### **IsValidAmountAsync *Rule* (Asynchronous)** ######
-```csharp
-    public class IsValidAmountAsync : RuleAsync<Order>
-    {   
-        public override async Task<IRuleResult> Invoke(Order order)
-        {
-            //Simulate API call to external service
-			await Task.Delay(10);
-
-            if (order.Amount <= 0.0m)
-            {
-                throw new InvalidOperationException();
-            }
-            
-            return Task.FromResult<object>(null);
-        }
-    }
-```
 
 <br />
 
