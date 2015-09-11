@@ -127,6 +127,20 @@ The return value of Rule/RuleAsync.
 
 #### **RuleEngine API** ####
 
+**Examples:**
+
+###### **Product (domain model)** ######
+
+```csharp
+    //Inherit your model from RuleEngine<T>
+    public class Product : RuleEngine<Product>
+	{
+		public string Name { get; set; }
+		public decimal Price { get; set; }
+		public string Description { get; set; }
+	}
+```
+
 ##### **Synchronous Example:** #####
 
 ```csharp
@@ -141,33 +155,6 @@ The return value of Rule/RuleAsync.
     IRuleResult[] ruleResults = p.Execute();
 ```
 
-##### **Asynchronous Example:** #####
-
-```csharp
-
-    //New up your model
-    Product p = new Product();
-    
-    //Add rules to run against the model instance
-    p.AddRules(new UpdateDescriptionAsync(),
-               new UpdateNameAsync());
-
-    //Execute the rules. (Null rule results will be ignored by Execute method)
-    IRuleResult[] ruleResults = await p.ExecuteAsync();
-```
-
-###### **Product (domain model)** ######
-
-```csharp
-    //Inherit your model from RuleEngine<T>
-    public class Product : RuleEngine<Product>
-	{
-		public string Name { get; set; }
-		public decimal Price { get; set; }
-		public string Description { get; set; }
-	}
-```
- 
 ###### **UpdateDescription *Rule* (Synchronous)** ######
     
 ```csharp
@@ -183,6 +170,20 @@ The return value of Rule/RuleAsync.
     }
 ```
 
+##### **Asynchronous Example:** #####
+
+```csharp
+
+    //New up your model
+    Product p = new Product();
+    
+    //Add rules to run against the model instance
+    p.AddRules(new UpdateDescriptionAsync());
+
+    //Execute the rules. (Null rule results will be ignored by Execute method)
+    IRuleResult[] ruleResults = await p.ExecuteAsync();
+```
+
 ###### **UpdateDescriptionAsync *Rule* (Asynchronous)** ######
 
 ```csharp
@@ -195,23 +196,6 @@ The return value of Rule/RuleAsync.
             await Task.Delay(10);
 
             product.Description = "Desktop Computer";
-
-            return Task.FromResult<object>(null);
-        }
-    }
-```
-
-###### **UpdateNameAsync *Rule* (Asynchronous)** ######
-
-```csharp
-    public class UpdateNameAsync : RuleAsync<Product>
-    {
-        public override async Task<IRuleResult> InvokeAsync(Product product)
-        {
-            //Simulate API call to external service
-            await Task.Delay(10);
-
-            product.Name = "Dell Inspiron";
 
             return Task.FromResult<object>(null);
         }
