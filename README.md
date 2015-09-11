@@ -3,7 +3,7 @@
 
 <br />
 > DotNetRuleEngine is a ***Rule Engine*** that allows you to write sophisticated 
-> rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution. But most importantly it does this in a very simple and elegant way.
+> rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution. And most importantly it does this in a simple and an elegant way.
 
 
 ```csharp
