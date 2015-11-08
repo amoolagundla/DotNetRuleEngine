@@ -15,7 +15,7 @@ namespace DotNetRuleEngine.Test
             var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
             ruleEngineExecutor.AddRules(new ProductRule());
             var ruleResults = ruleEngineExecutor.Execute();
-            Assert.AreEqual("Product Description", ruleResults.First().Result);
+            Assert.AreEqual("Product Description", ruleResults.FindRuleResult<ProductRule>().Result);
         }
 
         [TestMethod]
@@ -26,7 +26,7 @@ namespace DotNetRuleEngine.Test
             var ruleResults = ruleEngineExecutor.Execute();
 
             object value;
-            ruleResults.First().Data.TryGetValue("Key", out value);
+            ruleResults.FindRuleResult("ProductRule").Data.TryGetValue("Key", out value);
             Assert.AreEqual("Value", value);
         }
 
@@ -36,7 +36,9 @@ namespace DotNetRuleEngine.Test
             var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
             ruleEngineExecutor.AddRules(new ProductTerminateA(), new ProductTerminateB());
             var ruleResults = ruleEngineExecutor.Execute();
+            var ruleResult = ruleResults.FindRuleResult("ProductRule");
             Assert.AreEqual(1, ruleResults.Length);
+            Assert.IsNotNull(ruleResult);
         }
 
         [TestMethod]

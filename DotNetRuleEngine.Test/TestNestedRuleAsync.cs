@@ -15,12 +15,10 @@ namespace DotNetRuleEngine.Test
             var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
             ruleEngineExecutor.AddRules(new ProductNestedRuleAsync());
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
-            var nestedRuleResults = ruleResults.First().Result.To<IRuleResult[]>(); ;
-            var nestedRuleBResult = nestedRuleResults.First(n => n.Name == "ProductNestedRuleAsyncB");
+            var nestedRuleResult = ruleResults.FindNestedRuleResult("ProductNestedRuleAsyncC");
 
-            Assert.AreEqual(1, ruleResults.Length);
-            Assert.AreEqual(2, nestedRuleResults.Length);
-            Assert.AreEqual("ProductNestedRuleAsyncC", nestedRuleBResult.Result.To<IRuleResult[]>().First().Name);
+            Assert.IsNotNull(ruleResults);
+            Assert.AreEqual("ProductNestedRuleAsyncC", nestedRuleResult.Name);
         }
     }
 }
