@@ -9,7 +9,7 @@
 ```csharp
     PM> Install-Package DotNetRuleEngine
 ```
-Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.3.1 "DotNetRuleEngine")
+Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.3.2 "DotNetRuleEngine")
 
 
 #### **RuleEngineExecutor API:** ####
