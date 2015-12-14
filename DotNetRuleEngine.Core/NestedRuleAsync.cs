@@ -8,13 +8,7 @@ namespace DotNetRuleEngine.Core
     public abstract class NestedRuleAsync<T> : RuleEngine<T>,
         IRuleAsync<T> where T : class, new()
     {
-        private ConcurrentDictionary<string, object> _data = new ConcurrentDictionary<string, object>();
-
-        public ConcurrentDictionary<string, object> Data
-        {
-            get { return _data; }
-            set { _data = value; }
-        }
+        public ConcurrentDictionary<string, object> Data { get; set; } = new ConcurrentDictionary<string, object>();
 
         public Expression<Predicate<T>> Constraint { get; set; }
 
@@ -44,5 +38,6 @@ namespace DotNetRuleEngine.Core
         }
 
         public abstract Task<IRuleResult> InvokeAsync(T product);
+        public bool Parallel { get; set; }
     }
 }

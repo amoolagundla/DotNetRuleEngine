@@ -45,11 +45,16 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AsyncRules\ProductParallelUpdateDescriptionRuleAsync.cs" />
+    <Compile Include="AsyncRules\ProductParallelUpdateNameRuleAsync.cs" />
+    <Compile Include="AsyncRules\ProductParallelUpdatePriceRuleAsync.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Rules\ProductAfterInvokeA.cs" />
     <Compile Include="Rules\ProductAfterInvokeB.cs" />
@@ -78,6 +83,7 @@
     <Compile Include="Rules\ProductTryGetValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AsyncRules\ProductTryGetValueAsync.cs" />
+    <Compile Include="TestParallelRule.cs" />
     <Compile Include="TestRule.cs" />
     <Compile Include="TestRuleAsync.cs" />
     <Compile Include="TestNestedRule.cs" />

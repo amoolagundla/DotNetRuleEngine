@@ -35,6 +35,7 @@ namespace DotNetRuleEngine.Core
                 {
                     return FindNestedRuleResult<T>(result);
                 }
+
                 if (ruleResult.Name == typeof(T).Name)
                 {
                     return ruleResult;
@@ -48,10 +49,12 @@ namespace DotNetRuleEngine.Core
             foreach (var ruleResult in ruleResults)
             {
                 var result = ruleResult.Result as IEnumerable<IRuleResult>;
+
                 if (result != null)
                 {
                     return FindNestedRuleResult(result, ruleName);
                 }
+
                 if (string.Equals(ruleResult.Name, ruleName, StringComparison.InvariantCultureIgnoreCase))
                 {
                     return ruleResult;

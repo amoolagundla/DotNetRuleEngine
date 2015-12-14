@@ -7,7 +7,7 @@ namespace DotNetRuleEngine.Test.Rules
     {
         public override IRuleResult Invoke(Product product)
         {
-            Instance = product;
+            SetInstance(product);
             AddRules(new ProductNestedRuleA(), new ProductNestedRuleB());
             var ruleResults = Execute();
 

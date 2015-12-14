@@ -9,5 +9,7 @@ namespace DotNetRuleEngine.Core
         Task AfterInvokeAsync();
         
         Task<IRuleResult> InvokeAsync(T product);
+
+        bool Parallel { get; set; }
     }
 }

@@ -10,7 +10,9 @@ namespace DotNetRuleEngine.Core
         }
 
         public string Name { get; set; }
+
         public object Result { get; set; }
+
         public Dictionary<string, object> Data { get; set; }
     }
 }

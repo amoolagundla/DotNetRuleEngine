@@ -206,9 +206,36 @@ The return value of Rule/RuleAsync.
 
 #### Features ####
 
+##### Parallelization #####
+
+Async rules can be marked as ```Parallel```. Which allows them to be executed in parallel. 
+
+*If*  ```Parallel``` *is not specified, async rules are executed in the order they are added to the AddRules method.*
+
+###### Example ######
+```csharp
+    public class IsValidAmount : RuleAsync<Order>
+    {   
+ 		public override void BeforeInvoke()
+        {
+			Parallel = true;
+        }
+
+        public override async Task<IRuleResult> InvokeAsync(Product product)
+        {
+            if (order.Amount <= 0.0m)
+            {
+                throw new InvalidOperationException();
+            }
+
+            return Task.FromResult<object>(null);
+        }      
+    }
+```
+
 ##### NestedRule/NestedRuleAsync #####
 
-Rules can be nested. Derive from NestedRule or NestedRuleAsync to implement nested rules.
+Rules can be nested. Derive from ```NestedRule``` or ```NestedRuleAsync``` to implement nested rules.
 
 ###### Example ######
 ```csharp
@@ -345,6 +372,8 @@ If evaluated to false, Invoke method will not be executed. *Must be set before I
 
 ##### TryAdd/TryGet #####
 Share data between rules.
+
+*If the async rule marked parallel, this feature is not available.*
 
 ###### Example ######
 ```csharp

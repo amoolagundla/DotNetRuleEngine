@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Test.Models;
 using DotNetRuleEngine.Test.Rules;
@@ -76,8 +77,12 @@ namespace DotNetRuleEngine.Test
         {
             var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
             ruleEngineExecutor.AddRules(new ProductTryAdd(), new ProductTryGetValue());
-            var ruleResults = ruleEngineExecutor.Execute();
-            Assert.AreEqual("Product Description", ruleResults.First().Result);
+            var ruleResults = ruleEngineExecutor.Execute().FindRuleResult("ProductRule").Result.To<List<string>>();
+
+            Assert.AreEqual("Product Description1", ruleResults[0]);
+            Assert.AreEqual("Product Description2", ruleResults[1]);
+            Assert.AreEqual("Product Description3", ruleResults[2]);
+            Assert.AreEqual("Product Description4", ruleResults[3]);
         }
     }
 }
