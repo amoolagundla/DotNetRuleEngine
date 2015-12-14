@@ -2,7 +2,6 @@
 using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Test.AsyncRules;
 using DotNetRuleEngine.Test.Models;
-using DotNetRuleEngine.Test.Rules;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DotNetRuleEngine.Test
@@ -27,8 +26,8 @@ namespace DotNetRuleEngine.Test
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
 
             object value;
-            ruleResults.First().Data.TryGetValue("Key", out value);
-            Assert.AreEqual("Value", value);
+            ruleResults.First().Data.TryGetValue("Description", out value);
+            Assert.AreEqual("Description", value);
         }
 
         [TestMethod]

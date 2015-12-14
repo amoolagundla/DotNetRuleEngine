@@ -7,7 +7,7 @@ namespace DotNetRuleEngine.Core
 {
     public abstract class RuleAsync<T> : IRuleAsync<T> where T : class, new()
     {
-        public ConcurrentDictionary<string, object> Data { get; set; } = new ConcurrentDictionary<string, object>();
+        public ConcurrentDictionary<string, Task<object>> Data { get; set; } = new ConcurrentDictionary<string, Task<object>>();
 
         public Expression<Predicate<T>> Constraint{ get; set; }        
 
@@ -15,13 +15,13 @@ namespace DotNetRuleEngine.Core
 
         public bool Skip { get; set; }
 
-        public object TryGetValue(string key)
+        public async Task<object> TryGetValueAsync(string key)
         {
-            object name;
-            return Data.TryGetValue(key, out name) ? name : null;
+            Task<object> value;
+            return Data.TryGetValue(key, out value) ? await value : null;
         }
 
-        public bool TryAdd(string key, object value)
+        public bool TryAddAsync(string key, Task<object> value)
         {
             return Data.TryAdd(key, value);
         }
@@ -37,6 +37,8 @@ namespace DotNetRuleEngine.Core
         }
 
         public abstract Task<IRuleResult> InvokeAsync(T type);
+        
+
         public bool Parallel { get; set; }
     }
 }

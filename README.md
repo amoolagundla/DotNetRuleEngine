@@ -373,7 +373,6 @@ If evaluated to false, Invoke method will not be executed. *Must be set before I
 ##### TryAdd/TryGet #####
 Share data between rules.
 
-*If the async rule marked parallel, this feature is not available.*
 
 ###### Example ######
 ```csharp
@@ -398,5 +397,33 @@ Share data between rules.
  
             return null;
         }
+    }
+```
+
+##### TryAddAsync/TryGetAsync #####
+Share data between async rules.
+
+
+###### Example ######
+```csharp
+    public class UpdateDescription : AsyncRule<Product>
+    {
+        public override async Task<IRuleResult> InvokeAsync(Product product)
+        {
+            TryAddAsync("Description", Task.FromResult<object>(product.Description));
+
+            return Task.FromResult<object>(null);
+        }  
+    }
+```
+```csharp
+    public class UpdateName : AsyncRule<Product>
+    {
+        public override async Task<IRuleResult> InvokeAsync(Product product)
+        {
+            var description = TryGetValueAsync("Description").Result.To<string>();
+
+            return Task.FromResult<object>(null);
+        }  
     }
 ```

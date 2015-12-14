@@ -9,7 +9,8 @@ namespace DotNetRuleEngine.Core
 {
     public abstract class RuleEngine<T> where T : class, new()
     {
-        private readonly ConcurrentDictionary<string, object> _data = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, object> _sharedData = new ConcurrentDictionary<string, object>();
+        private readonly ConcurrentDictionary<string, Task<object>> _sharedDataAsync = new ConcurrentDictionary<string, Task<object>>();
         private readonly IList<IRuleResult> _ruleResults = new List<IRuleResult>();
         private readonly IList<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
 
@@ -44,7 +45,7 @@ namespace DotNetRuleEngine.Core
 
             foreach (var asyncRule in asynchronousRules)
             {
-                AddToDataCollection(asyncRule);
+                AddToAsyncDataCollection(asyncRule);
 
                 await asyncRule.BeforeInvokeAsync();
 
@@ -135,15 +136,17 @@ namespace DotNetRuleEngine.Core
 
             if (parallelRules.Any())
             {
-                parallelRules.ForEach(rule =>
+                parallelRules.ForEach(pRule =>
                 {
-                    if (!rule.Skip && Constrained(rule.Constraint))
+                    AddToAsyncDataCollection(pRule);
+
+                    if (!pRule.Skip && Constrained(pRule.Constraint))
                     {
                         var parallelTask = Task.Run(() =>
                         {
-                            return rule.BeforeInvokeAsync()
-                                    .ContinueWith(t => rule.InvokeAsync(Instance).Result)
-                                    .ContinueWith(t => { rule.AfterInvokeAsync(); return t.Result; });
+                            return pRule.BeforeInvokeAsync()
+                                    .ContinueWith(t => pRule.InvokeAsync(Instance).Result)
+                                    .ContinueWith(t => { pRule.AfterInvokeAsync(); return t.Result; });
                         });
 
                         parallelRuleResults.Add(parallelTask);
@@ -167,16 +170,29 @@ namespace DotNetRuleEngine.Core
             return predicate == null || predicate.Compile().Invoke(Instance);
         }
 
-        private void AddToDataCollection(IGeneralRule<T> rule)
+        private void AddToAsyncDataCollection(IRuleAsync<T> rule)
         {
             if (rule != null)
             {
                 foreach (var pair in rule.Data)
                 {
-                    _data.TryAdd(pair.Key, pair.Value);
+                    _sharedDataAsync.TryAdd(pair.Key, pair.Value);
                 }
 
-                rule.Data = _data;
+                rule.Data = _sharedDataAsync;
+            }
+        }
+
+        private void AddToDataCollection(IRule<T> rule)
+        {
+            if (rule != null)
+            {
+                foreach (var pair in rule.Data)
+                {
+                    _sharedData.TryAdd(pair.Key, pair.Value);
+                }
+
+                rule.Data = _sharedData;
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DotNetRuleEngine.Core
 {
@@ -9,6 +10,11 @@ namespace DotNetRuleEngine.Core
         public static T To<T>(this object @object)
         {
             return @object != null ? (T)@object : default(T);
+        }
+
+        public static T To<T>(this Task<object> @object)
+        {
+            return @object != null ? (T)@object.Result : default(T);
         }
 
         public static IRuleResult FindRuleResult<T>(this IEnumerable<IRuleResult> ruleResults)
