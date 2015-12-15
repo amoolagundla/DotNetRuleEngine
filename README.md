@@ -9,7 +9,7 @@
 ```csharp
     PM> Install-Package DotNetRuleEngine
 ```
-Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.3.2 "DotNetRuleEngine")
+Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.4.0 "DotNetRuleEngine")
 
 
 #### **RuleEngineExecutor API:** ####
@@ -210,7 +210,7 @@ The return value of Rule/RuleAsync.
 
 Async rules can be marked as ```Parallel```. Which allows them to be executed in parallel. 
 
-*If*  ```Parallel``` *is not specified, async rules are executed in the order they are added to the AddRules method.*
+If  ```Parallel``` not specified, async rules executed in the order they are added to the AddRules method.
 
 ###### Example ######
 ```csharp
