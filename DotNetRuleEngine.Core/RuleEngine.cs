@@ -53,7 +53,7 @@ namespace DotNetRuleEngine.Core
                 {
                     var ruleResult = await asyncRule.InvokeAsync(Instance);
 
-                    AddToRuleResults(ruleResult, asyncRule.GetType().Name);
+                    AddToRuleResults(ruleResult, asyncRule.GetType().Name, _asyncRuleResults);
                 }
 
                 await asyncRule.AfterInvokeAsync();
@@ -72,7 +72,7 @@ namespace DotNetRuleEngine.Core
             {
                 var ruleResult = rule.Result;
 
-                AddToRuleResults(ruleResult, rule.GetType().Name);
+                AddToRuleResults(ruleResult, rule.GetType().Name, _asyncRuleResults);
             });
 
             return _asyncRuleResults.ToArray();
@@ -98,15 +98,7 @@ namespace DotNetRuleEngine.Core
                     {
                         var ruleResult = rule.Invoke(Instance);
 
-                        if (ruleResult != null)
-                        {
-                            if (string.IsNullOrWhiteSpace(ruleResult.Name))
-                            {
-                                ruleResult.Name = rule.GetType().Name;
-                            }
-
-                            _ruleResults.Add(ruleResult);
-                        }
+                        AddToRuleResults(ruleResult, rule.GetType().Name, _ruleResults);                        
                     }
 
                     rule.AfterInvoke();
@@ -196,16 +188,14 @@ namespace DotNetRuleEngine.Core
             }
         }
 
-        private void AddToRuleResults(IRuleResult ruleResult, string ruleName)
+        private void AddToRuleResults(IRuleResult ruleResult, string ruleName, 
+            ICollection<IRuleResult> ruleResults)
         {
             if (ruleResult != null)
             {
-                if (string.IsNullOrWhiteSpace(ruleResult.Name))
-                {
-                    ruleResult.Name = ruleResult.Name ?? ruleName;
-                }
+                ruleResult.Name = ruleResult.Name ?? ruleName;
 
-                _asyncRuleResults.Add(ruleResult);
+                ruleResults.Add(ruleResult);
             }
         }
     }
