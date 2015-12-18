@@ -222,10 +222,10 @@ In the proceeding example, there are two rules. The order of execution would be 
 ```csharp
     public class ValidateProductAmount : RuleAsync<Order>
     {   
- 		public override void BeforeInvoke()
+        public override async BeforeInvoke()
         {
-		ExecutionOrder = 1;
-        }
+            ExecutionOrder = 1
+        }  
 
         public override async Task<IRuleResult> InvokeAsync(Product product)
         {
@@ -237,10 +237,10 @@ In the proceeding example, there are two rules. The order of execution would be 
 ```csharp
     public class ValidateProductName : RuleAsync<Order>
     {   
- 		public override void BeforeInvoke()
+        public override async BeforeInvoke()
         {
-		ExecutionOrder = 2;
-        }
+            ExecutionOrder = 2
+        }  
 
         public override async Task<IRuleResult> InvokeAsync(Product product)
         {
