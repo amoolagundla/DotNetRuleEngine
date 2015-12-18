@@ -251,9 +251,9 @@ In the proceeding example, there are two rules. The order of execution would be 
 
 ##### Parallelization #####
 
-Async rules can be marked as ```Parallel```. Which allows them to be executed in parallel. 
+Async rules can be specified as ```Parallel``` to be executed in parallel. 
 
-If  ```Parallel``` not specified, async rules executed in the order they are added to the AddRules method unless they have ```ExecutionOrder``` specified.
+If ```Parallel``` not specified, async rules executed in the order they are added to the AddRules method unless the ```ExecutionOrder``` specified.
 
 ###### Example ######
 ```csharp
