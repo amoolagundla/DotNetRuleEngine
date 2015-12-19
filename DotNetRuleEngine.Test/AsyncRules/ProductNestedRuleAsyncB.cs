@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Test.Models;
-using DotNetRuleEngine.Test.Rules;
 
 namespace DotNetRuleEngine.Test.AsyncRules
 {

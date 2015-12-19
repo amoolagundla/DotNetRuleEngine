@@ -77,5 +77,16 @@ namespace DotNetRuleEngine.Test
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
             Assert.AreEqual("Product Description", ruleResults.First().Result);
         }
+
+        [TestMethod]
+        public void TestExecutionOrder()
+        {
+            var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
+                .AddRules(new ProductAExecutionOrderRuleAsync(), new ProductBExecutionOrderRuleAsync())
+                .ExecuteAsync().Result;
+
+            Assert.AreEqual("ProductBExecutionOrderRuleAsync", ruleResults.First().Name);
+            Assert.AreEqual("ProductAExecutionOrderRuleAsync", ruleResults.Skip(1).First().Name);
+        }
     }
 }

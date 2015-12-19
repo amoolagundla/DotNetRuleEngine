@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Test.Models;
 
@@ -16,7 +14,6 @@ namespace DotNetRuleEngine.Test.AsyncRules
         {
             await Task.Delay(10);
             product.Description = "Description";
-            Debug.WriteLine("ProductParallelUpdateDescriptionRuleAsync");
 
             return await Task.FromResult<IRuleResult>(null);
         }

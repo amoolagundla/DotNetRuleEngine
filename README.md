@@ -212,7 +212,7 @@ The return value of Rule/RuleAsync.
 
 Rules can specify ```ExecutionOrder``` (asc to desc) rather than getting executed in the order they've been added to ```AddRules``` method.
 
-*if both* ```Parallel``` *and* ```ExecutionOrder``` *specified for async rule, then the parallelization would be ignored.*
+*if both* ```Parallel``` *and* ```ExecutionOrder``` *specified for async rule, then the parallelization gets ignored.*
 
 
 In the proceeding example, there are two rules. The order of execution would be ```ValidateProductAmount```, and then the ```ValidateProductName```
@@ -221,7 +221,7 @@ In the proceeding example, there are two rules. The order of execution would be 
 ```csharp
     public class ValidateProductAmount : RuleAsync<Order>
     {   
-        public override async BeforeInvoke()
+        public override SetExecutionOrder()
         {
             ExecutionOrder = 1
         }  
@@ -236,7 +236,7 @@ In the proceeding example, there are two rules. The order of execution would be 
 ```csharp
     public class ValidateProductName : RuleAsync<Order>
     {   
-        public override async BeforeInvoke()
+        public override SetExecutionOrder()
         {
             ExecutionOrder = 2
         }  
