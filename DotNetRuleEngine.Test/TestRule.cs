@@ -13,9 +13,10 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestInvoke()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
-            ruleEngineExecutor.AddRules(new ProductRule());
-            var ruleResults = ruleEngineExecutor.Execute();
+            var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
+                .AddRules(new ProductRule())
+                .Execute();
+            
             Assert.AreEqual("Product Description", ruleResults.FindRuleResult<ProductRule>().Result);
         }
 
@@ -23,8 +24,8 @@ namespace DotNetRuleEngine.Test
         public void TestBeforeInvoke()
         {
             var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
-            ruleEngineExecutor.AddRules(new ProductRule());
-            var ruleResults = ruleEngineExecutor.Execute();
+            var ruleResults = ruleEngineExecutor.AddRules(new ProductRule())
+                                                .Execute();
 
             object value;
             ruleResults.FindRuleResult("ProductRule").Data.TryGetValue("Key", out value);
@@ -83,6 +84,17 @@ namespace DotNetRuleEngine.Test
             Assert.AreEqual("Product Description2", ruleResults[1]);
             Assert.AreEqual("Product Description3", ruleResults[2]);
             Assert.AreEqual("Product Description4", ruleResults[3]);
+        }
+
+        [TestMethod]
+        public void TestExecutionOrder()
+        {
+            var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
+                .AddRules(new ProductExecutionOrderRuleA(), new ProductExecutionOrderRuleB())
+                .Execute();
+
+            Assert.AreEqual("ProductExecutionOrderRuleB", ruleResults.First().Name);
+            Assert.AreEqual("ProductExecutionOrderRuleA", ruleResults.Skip(1).First().Name);
         }
     }
 }

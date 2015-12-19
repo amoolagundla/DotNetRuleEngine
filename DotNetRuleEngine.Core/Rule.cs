@@ -14,6 +14,12 @@ namespace DotNetRuleEngine.Core
 
         public bool Skip { get; set; }
 
+        public int? ExecutionOrder { get; set; }
+
+        public virtual void SetExecutionOrder()
+        {
+        }
+
         public object TryGetValue(string key)
         {
             object name;

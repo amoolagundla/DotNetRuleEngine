@@ -10,5 +10,10 @@
         public RuleEngineExecutor()
         {
         }
+
+        public static RuleEngineExecutor<T> GetInstance(T instance)
+        {
+            return new RuleEngineExecutor<T>(instance);
+        } 
     }
 }

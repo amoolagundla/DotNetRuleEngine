@@ -19,13 +19,15 @@ namespace DotNetRuleEngine.Core
             Instance = this as T;
         }
 
-        public T Instance { get; set; }
-
         protected IList<IGeneralRule<T>> Rules { get; private set; }
 
-        public virtual void AddRules(params IGeneralRule<T>[] rules)
+        public T Instance { get; set; }
+
+
+        public virtual RuleEngine<T> AddRules(params IGeneralRule<T>[] rules)
         {
             Rules = rules.ToList();
+            return this;
         }
 
         public virtual void SetInstance(T instance)
@@ -39,9 +41,13 @@ namespace DotNetRuleEngine.Core
 
             if (Rules == null || !Rules.Any()) return _asyncRuleResults.ToArray();
 
-            var parallelRuleResults = ExecuteParallelRules(Rules).ToList();
+            InitializeExecutionOrder();
 
-            var asynchronousRules = GetAsynchronousRules();
+            var rulesWithExecutionOrder = GetRulesWithExecutionOrder<IRuleAsync<T>>(r=> r.ExecutionOrder.HasValue);
+            var rulesWithoutExecutionOrder = GetRulesWithoutExecutionOrder<IRuleAsync<T>>(r => !r.Parallel && !r.ExecutionOrder.HasValue);
+            var asynchronousRules = rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
+
+            var parallelRuleResults = ExecuteParallelRules(Rules).ToList();
 
             foreach (var asyncRule in asynchronousRules)
             {
@@ -78,45 +84,45 @@ namespace DotNetRuleEngine.Core
             return _asyncRuleResults.ToArray();
         }
 
-        private IEnumerable<IRuleAsync<T>> GetAsynchronousRules()
-        {
-            return Rules.OfType<IRuleAsync<T>>().Where(rule => !rule.Parallel);
-        }
-
         public virtual IRuleResult[] Execute()
         {
             ValidateInstance();
 
-            if (Rules != null && Rules.Any())
+            if (Rules == null || !Rules.Any()) return _ruleResults.ToArray();
+
+            InitializeExecutionOrder();
+
+            var rulesWithExecutionOrder = GetRulesWithExecutionOrder<IRule<T>>();
+            var rulesWithoutExecutionOrder = GetRulesWithoutExecutionOrder<IRule<T>>();
+            var rules = rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
+
+            foreach (var rule in rules)
             {
-                foreach (var rule in Rules.OfType<IRule<T>>())
+                AddToDataCollection(rule);
+                rule.BeforeInvoke();
+
+                if (!rule.Skip && Constrained(rule.Constraint))
                 {
-                    AddToDataCollection(rule);
-                    rule.BeforeInvoke();
+                    var ruleResult = rule.Invoke(Instance);
 
-                    if (!rule.Skip && Constrained(rule.Constraint))
-                    {
-                        var ruleResult = rule.Invoke(Instance);
+                    AddToRuleResults(ruleResult, rule.GetType().Name, _ruleResults);                        
+                }
 
-                        AddToRuleResults(ruleResult, rule.GetType().Name, _ruleResults);                        
-                    }
+                rule.AfterInvoke();
 
-                    rule.AfterInvoke();
-
-                    if (rule.Terminate)
-                    {
-                        break;
-                    }
+                if (rule.Terminate)
+                {
+                    break;
                 }
             }
 
             return _ruleResults.ToArray();
-        }
+        }        
 
         private IEnumerable<Task<IRuleResult>> ExecuteParallelRules(IEnumerable<IGeneralRule<T>> rules)
         {
             var parallelRules = rules.OfType<IRuleAsync<T>>()
-                .Where(rule => rule.Parallel)
+                .Where(rule => rule.Parallel && !rule.ExecutionOrder.HasValue)
                 .ToList();
 
             if (!parallelRules.Any())
@@ -196,6 +202,35 @@ namespace DotNetRuleEngine.Core
                 ruleResult.Name = ruleResult.Name ?? ruleName;
 
                 ruleResults.Add(ruleResult);
+            }
+        }
+
+        private IEnumerable<TK> GetRulesWithoutExecutionOrder<TK>(Func<TK, bool> condition = null) 
+            where TK : IGeneralRule<T>
+        {
+            condition = condition ?? (k => true);
+
+            return Rules.OfType<TK>().Where(r => !r.ExecutionOrder.HasValue)
+                .Where(condition).ToList();
+        }
+
+        private IEnumerable<TK> GetRulesWithExecutionOrder<TK>(Func<TK, bool> condition = null) 
+            where TK : IGeneralRule<T>
+        {
+            condition = condition ?? (k => true);
+
+            return Rules.OfType<TK>()
+                .Where(r => r.ExecutionOrder.HasValue)
+                .Where(condition)
+                .OrderBy(r => r.ExecutionOrder)
+                .ToList();
+        }
+
+        private void InitializeExecutionOrder()
+        {
+            foreach (var rule in Rules)
+            {
+                rule.SetExecutionOrder();
             }
         }
     }

@@ -16,6 +16,12 @@ namespace DotNetRuleEngine.Core
 
         public bool Skip { get; set; }
 
+        public int? ExecutionOrder { get; set; }
+
+        public virtual void SetExecutionOrder()
+        {
+        }
+
         public async Task<object> TryGetValueAsync(string key)
         {
             Task<object> value;

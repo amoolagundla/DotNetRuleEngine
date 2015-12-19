@@ -62,6 +62,7 @@
     <Compile Include="AsyncRules\ProductConstraintAsyncA.cs" />
     <Compile Include="AsyncRules\ProductConstraintAsyncB.cs" />
     <Compile Include="Rules\ProductConstraintB.cs" />
+    <Compile Include="Rules\ProductExecutionOrderRuleA.cs" />
     <Compile Include="Rules\ProductNestedRule.cs" />
     <Compile Include="Rules\ProductNestedRuleA.cs" />
     <Compile Include="AsyncRules\ProductNestedRuleAsync.cs" />

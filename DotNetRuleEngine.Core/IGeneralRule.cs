@@ -10,5 +10,9 @@ namespace DotNetRuleEngine.Core
         bool Terminate { get; set; }
 
         bool Skip { get; set; }
+
+        int? ExecutionOrder { get; set; }
+
+        void SetExecutionOrder();
     }
 }
