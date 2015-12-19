@@ -207,8 +207,6 @@ The return value of Rule/RuleAsync.
 
 ##### Execution Order #####
 
-(*in progress...*)
-
 Rules can specify ```ExecutionOrder``` (asc to desc) rather than getting executed in the order they've been added to ```AddRules``` method.
 
 *if both* ```Parallel``` *and* ```ExecutionOrder``` *specified for async rule, then the parallelization gets ignored.*
