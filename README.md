@@ -206,11 +206,54 @@ The return value of Rule/RuleAsync.
 
 #### Features ####
 
+##### Execution Order #####
+
+(*in progress...*)
+
+Rules can specify ```ExecutionOrder``` (asc to desc) rather than getting executed in the order they've been added to ```AddRules``` method.
+
+*if both* ```Parallel``` *and* ```ExecutionOrder``` *specified for async rule, then the parallelization would be ignored.*
+
+
+In the proceeding example, there are two rules. The order of execution would be ```ValidateProductAmount```, and then the ```ValidateProductName```
+
+###### Example ######
+```csharp
+    public class ValidateProductAmount : RuleAsync<Order>
+    {   
+        public override async BeforeInvoke()
+        {
+            ExecutionOrder = 1
+        }  
+
+        public override async Task<IRuleResult> InvokeAsync(Product product)
+        {
+            return Task.FromResult<object>(null);
+        }      
+    }
+```
+
+```csharp
+    public class ValidateProductName : RuleAsync<Order>
+    {   
+        public override async BeforeInvoke()
+        {
+            ExecutionOrder = 2
+        }  
+
+        public override async Task<IRuleResult> InvokeAsync(Product product)
+        {
+            return Task.FromResult<object>(null);
+        }      
+    }    
+```
+
+
 ##### Parallelization #####
 
-Async rules can be marked as ```Parallel```. Which allows them to be executed in parallel. 
+Async rules can be specified as ```Parallel``` to be executed in parallel. 
 
-If  ```Parallel``` not specified, async rules executed in the order they are added to the AddRules method.
+If ```Parallel``` not specified, async rules executed in the order they are added to the AddRules method unless the ```ExecutionOrder``` specified.
 
 ###### Example ######
 ```csharp
