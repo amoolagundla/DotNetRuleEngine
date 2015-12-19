@@ -24,10 +24,9 @@ namespace DotNetRuleEngine.Core
         public T Instance { get; set; }
 
 
-        public virtual RuleEngine<T> AddRules(params IGeneralRule<T>[] rules)
+        public virtual void AddRules(params IGeneralRule<T>[] rules)
         {
             Rules = rules.ToList();
-            return this;
         }
 
         public virtual void SetInstance(T instance)

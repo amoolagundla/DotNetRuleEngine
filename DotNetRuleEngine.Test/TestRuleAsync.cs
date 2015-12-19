@@ -82,7 +82,7 @@ namespace DotNetRuleEngine.Test
         public void TestExecutionOrder()
         {
             var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
-                .AddRules(new ProductAExecutionOrderRuleAsync(), new ProductBExecutionOrderRuleAsync())
+                .ApplyRules(new ProductAExecutionOrderRuleAsync(), new ProductBExecutionOrderRuleAsync())
                 .ExecuteAsync().Result;
 
             Assert.AreEqual("ProductBExecutionOrderRuleAsync", ruleResults.First().Name);

@@ -69,5 +69,13 @@ namespace DotNetRuleEngine.Core
 
             return null;
         }
+
+        public static RuleEngineExecutor<T> ApplyRules<T>(this RuleEngineExecutor<T> ruleEngineExecutor,
+            params IGeneralRule<T>[] rules) where T : class, new()
+        {
+            ruleEngineExecutor.AddRules(rules);
+            return ruleEngineExecutor;
+
+        }
     }
 }

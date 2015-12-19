@@ -14,7 +14,7 @@ namespace DotNetRuleEngine.Test
         public void TestInvoke()
         {
             var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
-                .AddRules(new ProductRule())
+                .ApplyRules(new ProductRule())
                 .Execute();
             
             Assert.AreEqual("Product Description", ruleResults.FindRuleResult<ProductRule>().Result);
@@ -24,7 +24,7 @@ namespace DotNetRuleEngine.Test
         public void TestBeforeInvoke()
         {
             var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
-            var ruleResults = ruleEngineExecutor.AddRules(new ProductRule())
+            var ruleResults = ruleEngineExecutor.ApplyRules(new ProductRule())
                                                 .Execute();
 
             object value;
@@ -90,7 +90,7 @@ namespace DotNetRuleEngine.Test
         public void TestExecutionOrder()
         {
             var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
-                .AddRules(new ProductExecutionOrderRuleA(), new ProductExecutionOrderRuleB())
+                .ApplyRules(new ProductExecutionOrderRuleA(), new ProductExecutionOrderRuleB())
                 .Execute();
 
             Assert.AreEqual("ProductExecutionOrderRuleB", ruleResults.First().Name);
