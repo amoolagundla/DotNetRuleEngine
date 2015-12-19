@@ -2,14 +2,13 @@
 ## (Rule Based Software Development) ##
 *S.O.L.I.D COMPLIANT*
 <br />
-> DotNetRuleEngine is a ***Rule Engine*** that allows you to write sophisticated 
-> rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution. And most importantly it does this in a simple and an elegant way.
+> DotNetRuleEngine allows you to write your business logic as series of rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution and it is **S.O.L.I.D** compliant.
 
 
 ```csharp
     PM> Install-Package DotNetRuleEngine
 ```
-Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.4.1 "DotNetRuleEngine")
+Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.4.2 "DotNetRuleEngine")
 
 
 #### **RuleEngineExecutor API:** ####
