@@ -60,11 +60,13 @@
     <Compile Include="AsyncRules\ProductBExecutionOrderRuleAsync.cs" />
     <Compile Include="Rules\ProductAfterInvokeA.cs" />
     <Compile Include="Rules\ProductAfterInvokeB.cs" />
+    <Compile Include="Rules\ProductChildErrorRule.cs" />
     <Compile Include="Rules\ProductConstraintA.cs" />
     <Compile Include="AsyncRules\ProductConstraintAsyncA.cs" />
     <Compile Include="AsyncRules\ProductConstraintAsyncB.cs" />
     <Compile Include="Rules\ProductConstraintB.cs" />
     <Compile Include="Rules\ProductExecutionOrderRuleA.cs" />
+    <Compile Include="Rules\ProductNestedErrorRule.cs" />
     <Compile Include="Rules\ProductNestedRule.cs" />
     <Compile Include="Rules\ProductNestedRuleA.cs" />
     <Compile Include="AsyncRules\ProductNestedRuleAsync.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Rules\ProductNestedRuleC.cs" />
     <Compile Include="Rules\ProductRule.cs" />
     <Compile Include="AsyncRules\ProductRuleAsync.cs" />
+    <Compile Include="Rules\ProductRuleError.cs" />
     <Compile Include="Rules\ProductSkip.cs" />
     <Compile Include="AsyncRules\ProductSkipAsync.cs" />
     <Compile Include="Rules\ProductTerminateA.cs" />

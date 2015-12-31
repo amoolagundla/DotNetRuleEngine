@@ -14,5 +14,7 @@ namespace DotNetRuleEngine.Core
         public object Result { get; set; }
 
         public Dictionary<string, object> Data { get; set; }
+
+        public IError Error { get; set; }
     }
 }

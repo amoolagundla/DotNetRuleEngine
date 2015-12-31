@@ -9,5 +9,7 @@ namespace DotNetRuleEngine.Core
         object Result { get; set; }
 
         Dictionary<string, object> Data { get; set; }
+
+        IError Error { get; set; }
     }
 }

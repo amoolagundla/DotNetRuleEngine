@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Test.Models;
@@ -95,6 +96,18 @@ namespace DotNetRuleEngine.Test
 
             Assert.AreEqual("ProductExecutionOrderRuleB", ruleResults.First().Name);
             Assert.AreEqual("ProductExecutionOrderRuleA", ruleResults.Skip(1).First().Name);
+        }
+
+        [TestMethod]
+        public void TestErrorResult()
+        {
+            var errors = RuleEngineExecutor<Product>.GetInstance(new Product())
+                .ApplyRules(new ProductRule(), new ProductRuleError())
+                .Execute()
+                .GetErrors();
+
+            Assert.AreEqual("Error", errors.FindRuleResult<ProductRuleError>().Error.Message);
+            Assert.AreEqual(typeof(Exception), errors.FindRuleResult<ProductRuleError>().Error.Exception.GetType());
         }
     }
 }

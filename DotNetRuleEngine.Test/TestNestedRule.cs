@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using DotNetRuleEngine.Core;
+﻿using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Test.Models;
 using DotNetRuleEngine.Test.Rules;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,6 +18,18 @@ namespace DotNetRuleEngine.Test
 
             Assert.IsNotNull(nestedRuleResult);
             Assert.AreEqual("ProductNestedRuleC", nestedRuleResult.Name);
+        }
+
+        [TestMethod]
+        public void TestNestedRuleError()
+        {
+            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            ruleEngineExecutor.AddRules(new ProductNestedErrorRule());
+            var ruleResults = ruleEngineExecutor.Execute();
+            var errors = ruleResults.GetErrors();
+
+            Assert.IsNotNull(errors);
+            Assert.AreEqual("Error", errors.FindRuleResult<ProductChildErrorRule>().Error.Message);
         }
     }
 }

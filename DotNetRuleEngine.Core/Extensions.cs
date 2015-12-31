@@ -74,8 +74,35 @@ namespace DotNetRuleEngine.Core
             params IGeneralRule<T>[] rules) where T : class, new()
         {
             ruleEngineExecutor.AddRules(rules);
-            return ruleEngineExecutor;
 
+            return ruleEngineExecutor;
+        }
+
+        public static IRuleResult[] GetErrors(this IEnumerable<IRuleResult> ruleResults)
+        {
+            var list = new List<IRuleResult>();
+            GetErrors(ruleResults, list);
+
+            return list.ToArray();
+        }
+
+        private static void GetErrors(IEnumerable<IRuleResult> ruleResults,
+            ICollection<IRuleResult> errorResults)
+        {
+            foreach (var ruleResult in ruleResults)
+            {
+                var results = ruleResult.Result as IEnumerable<IRuleResult>;
+
+                if (results != null)
+                {
+                    GetErrors(results, errorResults);
+                }
+
+                if (ruleResult.Error != null)
+                {
+                    errorResults.Add(ruleResult);
+                }
+            }
         }
     }
 }
