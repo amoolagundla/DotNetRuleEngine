@@ -106,16 +106,11 @@ The return value of Rule/RuleAsync.
 <td>Data</td>
 <td>Used to store any arbitrary data.</td>
 </tr>
+<td>Error</td>
+<td>Used to store error details.</td>
+</tr>
 </table>
 
-```csharp
-    public interface IRuleResult
-    {
-        string Name { get; set; }
-        object Result { get; set; }
-        Dictionary<string, object> Data { get; set; }
-    }
-```
 
 **RuleResult is the implementation of IRuleResult*
 
