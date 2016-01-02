@@ -496,3 +496,22 @@ Share data between async rules.
         }      
     }
 ```
+
+
+```csharp
+	void Main()
+	{
+		Product product = new Product()
+
+		//Get all rule results
+		var results = RuleEngineExecutor<Foo>.GetInstance(product)
+			.ApplyRules(new IsValidAmount())
+			.Execute();
+			
+        //Get specific rule result
+        var isValidAmountResult = results.FindRuleResult<IsValidAmount>();
+
+        //Get errored rules.
+		results.GetErrors();
+	}
+```
