@@ -8,7 +8,7 @@
 ```csharp
     PM> Install-Package DotNetRuleEngine
 ```
-Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.4.2 "DotNetRuleEngine")
+Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.4.3 "DotNetRuleEngine")
 
 
 #### **RuleEngineExecutor API:** ####
@@ -278,7 +278,7 @@ Rules can be nested. Derive from ```NestedRule``` or ```NestedRuleAsync``` to im
     {   
         public override IRuleResult Invoke(Order order)
         {
-            Instance = order;
+            SetInstance(order);
             AddRules(new AmountGreaterThan1000());
 			ruleResults = Execute();
 

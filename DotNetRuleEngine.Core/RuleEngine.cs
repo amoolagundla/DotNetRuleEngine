@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace DotNetRuleEngine.Core
 {
+    /// <summary>
+    /// Rule Engine.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class RuleEngine<T> where T : class, new()
     {
         private readonly ConcurrentDictionary<string, object> _sharedData = new ConcurrentDictionary<string, object>();
@@ -14,37 +18,53 @@ namespace DotNetRuleEngine.Core
         private readonly IList<IRuleResult> _ruleResults = new List<IRuleResult>();
         private readonly IList<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
 
+        /// <summary>
+        /// Rule engine ctor.
+        /// </summary>
         protected RuleEngine()
         {
             Instance = this as T;
         }
 
+        /// <summary>
+        /// Rules.
+        /// </summary>
         protected IList<IGeneralRule<T>> Rules { get; private set; }
 
+        /// <summary>
+        /// Instance
+        /// </summary>
         public T Instance { get; set; }
 
-
+        /// <summary>
+        /// Used to add rules to rule engine.
+        /// </summary>
+        /// <param name="rules">Rule(s) list.</param>
         public virtual void AddRules(params IGeneralRule<T>[] rules)
         {
             Rules = rules.ToList();
         }
 
+        /// <summary>
+        /// Used to set instance.
+        /// </summary>
+        /// <param name="instance">Instance</param>
         public virtual void SetInstance(T instance)
         {
             Instance = instance;
         }
 
+        /// <summary>
+        /// Used to execute async rules.
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task<IRuleResult[]> ExecuteAsync()
         {
             ValidateInstance();
 
-            if (Rules == null || !Rules.Any()) return _asyncRuleResults.ToArray();
-
-            InitializeExecutionOrder();
-
-            var rulesWithExecutionOrder = GetRulesWithExecutionOrder<IRuleAsync<T>>(r=> r.ExecutionOrder.HasValue);
-            var rulesWithoutExecutionOrder = GetRulesWithoutExecutionOrder<IRuleAsync<T>>(r => !r.Parallel && !r.ExecutionOrder.HasValue);
-            var asynchronousRules = rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
+            if (Rules == null || !Rules.Any()) return _asyncRuleResults.ToArray();            
+            
+            var asynchronousRules = SetupAsyncRules();
 
             var parallelRuleResults = ExecuteParallelRules(Rules).ToList();
 
@@ -83,17 +103,17 @@ namespace DotNetRuleEngine.Core
             return _asyncRuleResults.ToArray();
         }
 
+        /// <summary>
+        /// Used to execute rules.
+        /// </summary>
+        /// <returns></returns>
         public virtual IRuleResult[] Execute()
         {
             ValidateInstance();
 
-            if (Rules == null || !Rules.Any()) return _ruleResults.ToArray();
+            if (Rules == null || !Rules.Any()) return _ruleResults.ToArray();            
 
-            InitializeExecutionOrder();
-
-            var rulesWithExecutionOrder = GetRulesWithExecutionOrder<IRule<T>>();
-            var rulesWithoutExecutionOrder = GetRulesWithoutExecutionOrder<IRule<T>>();
-            var rules = rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
+            var rules = SetupRules();
 
             foreach (var rule in rules)
             {
@@ -131,27 +151,47 @@ namespace DotNetRuleEngine.Core
 
             var parallelRuleResults = new List<Task<IRuleResult>>();
 
-            if (parallelRules.Any())
+            parallelRules.ForEach(pRule =>
             {
-                parallelRules.ForEach(pRule =>
+                AddToAsyncDataCollection(pRule);
+
+                if (!pRule.Skip && Constrained(pRule.Constraint))
                 {
-                    AddToAsyncDataCollection(pRule);
-
-                    if (!pRule.Skip && Constrained(pRule.Constraint))
+                    var parallelTask = Task.Run(() =>
                     {
-                        var parallelTask = Task.Run(() =>
-                        {
-                            return pRule.BeforeInvokeAsync()
-                                    .ContinueWith(t => pRule.InvokeAsync(Instance).Result)
-                                    .ContinueWith(t => { pRule.AfterInvokeAsync(); return t.Result; });
-                        });
+                        return pRule.BeforeInvokeAsync()
+                                .ContinueWith(t => pRule.InvokeAsync(Instance).Result)
+                                .ContinueWith(t => { pRule.AfterInvokeAsync(); return t.Result; });
+                    });
 
-                        parallelRuleResults.Add(parallelTask);
-                    }
-                });
-            }
-            
+                    parallelRuleResults.Add(parallelTask);
+                }
+            });
+
             return parallelRuleResults;
+        }
+
+        private IEnumerable<IRuleAsync<T>> SetupAsyncRules()
+        {
+            InitializeExecutionOrder();
+
+            var rulesWithExecutionOrder = 
+                GetRulesWithExecutionOrder<IRuleAsync<T>>(r => r.ExecutionOrder.HasValue);
+
+            var rulesWithoutExecutionOrder = 
+                GetRulesWithoutExecutionOrder<IRuleAsync<T>>(r => !r.Parallel && !r.ExecutionOrder.HasValue);
+
+            return rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
+        }
+
+        private IEnumerable<IRule<T>> SetupRules()
+        {
+            InitializeExecutionOrder();
+
+            var rulesWithExecutionOrder = GetRulesWithExecutionOrder<IRule<T>>();
+            var rulesWithoutExecutionOrder = GetRulesWithoutExecutionOrder<IRule<T>>();
+
+            return rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
         }
 
         private void ValidateInstance()
