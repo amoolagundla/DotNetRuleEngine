@@ -123,6 +123,7 @@ The return value of Rule/RuleAsync.
 
 **Examples:**
 
+
 ###### **Product (domain model)** ######
 
 ```csharp
@@ -460,5 +461,38 @@ Share data between async rules.
 
             return Task.FromResult<object>(null);
         }  
+    }
+```
+
+##### IRuleResult #####
+```RuleResult``` can be returned from Rule/RuleAsync. (If no result needs to be returned, then simply return ```null``` from ```Rule```, or  ```Task.FromResult<object>(null);``` from ```AsynRule```) 
+
+###### Example ######
+```csharp
+    public class IsValidAmount : Rule<Order>
+    {   
+        ProductRepository _productRepository;
+
+		RuleResult ruleResult = new RuleResult();
+
+		public IsValidAmount(ProductRepository productRepository)
+        {
+            _productRepository = productRepository;
+        }
+
+        public override Invoke(Product product)
+        {            
+			try
+            {
+				var productAvailability = _productRepository.GetAvailability(product);
+				ruleResult.Result = productAvailability;
+            } 
+            catch(Exception exception)
+            {
+				ruleResult.Error = new Error { Message = "Could't get details", Exception = exception };
+            }
+
+            return ruleResult;
+        }      
     }
 ```
