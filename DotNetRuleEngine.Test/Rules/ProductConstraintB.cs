@@ -7,7 +7,7 @@ namespace DotNetRuleEngine.Test.Rules
     {
         public override void BeforeInvoke()
         {
-            Constraint = product => product.Description == "";
+            Configuration.Constraint = product => product.Description == "";
         }
 
         public override IRuleResult Invoke(Product product)

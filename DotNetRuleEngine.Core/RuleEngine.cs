@@ -74,7 +74,7 @@ namespace DotNetRuleEngine.Core
 
                 await asyncRule.BeforeInvokeAsync();
 
-                if (!asyncRule.Skip && Constrained(asyncRule.Constraint))
+                if (!asyncRule.Configuration.Skip && Constrained(asyncRule.Configuration.Constraint))
                 {
                     var ruleResult = await asyncRule.InvokeAsync(Instance);
 
@@ -83,7 +83,7 @@ namespace DotNetRuleEngine.Core
 
                 await asyncRule.AfterInvokeAsync();
 
-                if (asyncRule.Terminate)
+                if (asyncRule.Configuration.Terminate)
                 {
                     break;
                 }
@@ -120,7 +120,7 @@ namespace DotNetRuleEngine.Core
                 AddToDataCollection(rule);
                 rule.BeforeInvoke();
 
-                if (!rule.Skip && Constrained(rule.Constraint))
+                if (!rule.Configuration.Skip && Constrained(rule.Configuration.Constraint))
                 {
                     var ruleResult = rule.Invoke(Instance);
 
@@ -129,7 +129,7 @@ namespace DotNetRuleEngine.Core
 
                 rule.AfterInvoke();
 
-                if (rule.Terminate)
+                if (rule.Configuration.Terminate)
                 {
                     break;
                 }
@@ -141,7 +141,7 @@ namespace DotNetRuleEngine.Core
         private IEnumerable<Task<IRuleResult>> ExecuteParallelRules(IEnumerable<IGeneralRule<T>> rules)
         {
             var parallelRules = rules.OfType<IRuleAsync<T>>()
-                .Where(rule => rule.Parallel && !rule.ExecutionOrder.HasValue)
+                .Where(rule => rule.Parallel && !rule.Configuration.ExecutionOrder.HasValue)
                 .ToList();
 
             if (!parallelRules.Any())
@@ -155,7 +155,7 @@ namespace DotNetRuleEngine.Core
             {
                 AddToAsyncDataCollection(pRule);
 
-                if (!pRule.Skip && Constrained(pRule.Constraint))
+                if (!pRule.Configuration.Skip && Constrained(pRule.Configuration.Constraint))
                 {
                     var parallelTask = Task.Run(() =>
                     {
@@ -176,10 +176,10 @@ namespace DotNetRuleEngine.Core
             InitializeExecutionOrder();
 
             var rulesWithExecutionOrder = 
-                GetRulesWithExecutionOrder<IRuleAsync<T>>(r => r.ExecutionOrder.HasValue);
+                GetRulesWithExecutionOrder<IRuleAsync<T>>(r => r.Configuration.ExecutionOrder.HasValue);
 
             var rulesWithoutExecutionOrder = 
-                GetRulesWithoutExecutionOrder<IRuleAsync<T>>(r => !r.Parallel && !r.ExecutionOrder.HasValue);
+                GetRulesWithoutExecutionOrder<IRuleAsync<T>>(r => !r.Parallel && !r.Configuration.ExecutionOrder.HasValue);
 
             return rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
         }
@@ -249,7 +249,7 @@ namespace DotNetRuleEngine.Core
         {
             condition = condition ?? (k => true);
 
-            return Rules.OfType<TK>().Where(r => !r.ExecutionOrder.HasValue)
+            return Rules.OfType<TK>().Where(r => !r.Configuration.ExecutionOrder.HasValue)
                 .Where(condition).ToList();
         }
 
@@ -259,9 +259,9 @@ namespace DotNetRuleEngine.Core
             condition = condition ?? (k => true);
 
             return Rules.OfType<TK>()
-                .Where(r => r.ExecutionOrder.HasValue)
+                .Where(r => r.Configuration.ExecutionOrder.HasValue)
                 .Where(condition)
-                .OrderBy(r => r.ExecutionOrder)
+                .OrderBy(r => r.Configuration.ExecutionOrder)
                 .ToList();
         }
 
@@ -269,7 +269,7 @@ namespace DotNetRuleEngine.Core
         {
             foreach (var rule in Rules)
             {
-                rule.SetExecutionOrder();
+                rule.Initialize();
             }
         }
     }

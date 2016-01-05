@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
+﻿using System.Collections.Concurrent;
 
 namespace DotNetRuleEngine.Core
 {
@@ -8,17 +6,7 @@ namespace DotNetRuleEngine.Core
     {
         public ConcurrentDictionary<string, object> Data { get; set; } = new ConcurrentDictionary<string, object>();
 
-        public Expression<Predicate<T>> Constraint { get; set; }
-
-        public bool Terminate { get; set; }
-
-        public bool Skip { get; set; }
-
-        public int? ExecutionOrder { get; set; }
-
-        public virtual void SetExecutionOrder()
-        {
-        }
+        public Configuration<T> Configuration { get; set; } = new Configuration<T>();        
 
         public object TryGetValue(string key)
         {
@@ -39,6 +27,10 @@ namespace DotNetRuleEngine.Core
         {
         }
 
-        public abstract IRuleResult Invoke(T type);
+        public virtual void Initialize()
+        {
+        }
+
+        public abstract IRuleResult Invoke(T type);        
     }
 }

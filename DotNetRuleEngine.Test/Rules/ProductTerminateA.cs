@@ -7,7 +7,7 @@ namespace DotNetRuleEngine.Test.Rules
     {
         public override void AfterInvoke()
         {
-            Terminate = true;
+            Configuration.Terminate = true;
         }
 
         public override IRuleResult Invoke(Product product)

@@ -6,9 +6,9 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     public class ProductBExecutionOrderRuleAsync : RuleAsync<Product>
     {
-        public override void SetExecutionOrder()
+        public override void Initialize()
         {
-            ExecutionOrder = 1;
+            Configuration.ExecutionOrder = 1;
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)

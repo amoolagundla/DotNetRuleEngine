@@ -7,7 +7,7 @@ namespace DotNetRuleEngine.Test.Rules
     {
         public override void BeforeInvoke()
         {
-            Skip = true;
+            Configuration.Skip = true;
         }
 
         public override IRuleResult Invoke(Product product)

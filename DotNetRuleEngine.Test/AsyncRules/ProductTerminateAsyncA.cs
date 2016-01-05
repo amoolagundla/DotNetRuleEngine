@@ -8,7 +8,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
     {
         public override Task AfterInvokeAsync()
         {
-            Terminate = true;
+            Configuration.Terminate = true;
             return Task.FromResult<object>(null);
         }
 

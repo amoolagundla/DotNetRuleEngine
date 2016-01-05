@@ -1,18 +1,9 @@
-﻿using System;
-using System.Linq.Expressions;
-
-namespace DotNetRuleEngine.Core
+﻿namespace DotNetRuleEngine.Core
 {
     public interface IGeneralRule<T> where T : class, new()
     {        
-        Expression<Predicate<T>> Constraint { get; set; }
+        Configuration<T> Configuration { get; set;  }
 
-        bool Terminate { get; set; }
-
-        bool Skip { get; set; }
-
-        int? ExecutionOrder { get; set; }
-
-        void SetExecutionOrder();
+        void Initialize();
     }
 }

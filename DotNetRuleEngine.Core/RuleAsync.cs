@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
+﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace DotNetRuleEngine.Core
@@ -9,17 +7,7 @@ namespace DotNetRuleEngine.Core
     {
         public ConcurrentDictionary<string, Task<object>> Data { get; set; } = new ConcurrentDictionary<string, Task<object>>();
 
-        public Expression<Predicate<T>> Constraint{ get; set; }        
-
-        public bool Terminate { get; set; }
-
-        public bool Skip { get; set; }
-
-        public int? ExecutionOrder { get; set; }
-
-        public virtual void SetExecutionOrder()
-        {
-        }
+        public Configuration<T> Configuration { get; set; } = new Configuration<T>();
 
         public async Task<object> TryGetValueAsync(string key)
         {
@@ -42,9 +30,13 @@ namespace DotNetRuleEngine.Core
             await Task.FromResult<object>(null);
         }
 
+        public virtual void Initialize()
+        {
+        }
+
         public abstract Task<IRuleResult> InvokeAsync(T type);
         
 
-        public bool Parallel { get; set; }
+        public bool Parallel { get; set; }        
     }
 }

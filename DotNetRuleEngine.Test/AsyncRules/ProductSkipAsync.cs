@@ -8,7 +8,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
     {
         public override Task BeforeInvokeAsync()
         {
-            Skip = true;
+            Configuration.Skip = true;
             return Task.FromResult<object>(null);
         }
 

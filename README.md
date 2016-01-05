@@ -214,9 +214,9 @@ In the proceeding example, there are two rules. The order of execution would be 
 ```csharp
     public class ValidateProductAmount : RuleAsync<Order>
     {   
-        public override SetExecutionOrder()
+        public override Initialize()
         {
-            ExecutionOrder = 1
+            Configuration.ExecutionOrder = 1
         }  
 
         public override async Task<IRuleResult> InvokeAsync(Product product)
@@ -229,9 +229,9 @@ In the proceeding example, there are two rules. The order of execution would be 
 ```csharp
     public class ValidateProductName : RuleAsync<Order>
     {   
-        public override SetExecutionOrder()
+        public override Initialize()
         {
-            ExecutionOrder = 2
+            Configuration.ExecutionOrder = 2
         }  
 
         public override async Task<IRuleResult> InvokeAsync(Product product)
@@ -354,7 +354,7 @@ Marks the rule to be skipped. Invoke method will not be executed. *Must be set b
 
         public override void BeforeInvoke()
         {
-			Skip = true;
+			Configuration.Skip = true;
         }
     }
 ```
@@ -378,7 +378,7 @@ Terminates execution of the remaining rules.
 
         public override void AfterInvoke()
         {
-			Terminate = true;
+			Configuration.Terminate = true;
         }
     }
 ```
@@ -401,7 +401,7 @@ If evaluated to false, Invoke method will not be executed. *Must be set before I
 
         public override void BeforeInvoke()
         {
-			Constraint = order => order.Amount > 1000;
+			Configuration.Constraint = order => order.Amount > 1000;
         }
     }
 ```

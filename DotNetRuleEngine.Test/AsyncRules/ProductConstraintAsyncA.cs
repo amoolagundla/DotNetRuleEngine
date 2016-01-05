@@ -8,7 +8,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
     {
         public override Task BeforeInvokeAsync()
         {
-            Constraint = product => product.Description == "Description";
+            Configuration.Constraint = product => product.Description == "Description";
             return Task.FromResult<object>(null);
         }
 
