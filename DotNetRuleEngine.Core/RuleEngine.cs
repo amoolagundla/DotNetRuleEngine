@@ -111,7 +111,8 @@ namespace DotNetRuleEngine.Core
             var asynRules = GetAsyncRules(rules);
 
             foreach (var asyncRule in asynRules)
-            {               
+            {
+                AddToAsyncDataCollection(asyncRule);
                 await asyncRule.BeforeInvokeAsync();
 
                 if (!asyncRule.Configuration.Skip && Constrained(asyncRule.Configuration.Constraint))
@@ -127,8 +128,6 @@ namespace DotNetRuleEngine.Core
                 }
 
                 await asyncRule.AfterInvokeAsync();
-
-                AddToAsyncDataCollection(asyncRule);
 
                 if (asyncRule.Configuration.Terminate)
                 {
@@ -150,6 +149,7 @@ namespace DotNetRuleEngine.Core
 
         private bool Execute(IRule<T> rule)
         {
+            AddToDataCollection(rule);
             rule.BeforeInvoke();
 
             if (!rule.Configuration.Skip && Constrained(rule.Configuration.Constraint))
@@ -169,8 +169,6 @@ namespace DotNetRuleEngine.Core
             }
 
             rule.AfterInvoke();
-
-            AddToDataCollection(rule);
 
             return rule.Configuration.Terminate;
         }
@@ -265,7 +263,7 @@ namespace DotNetRuleEngine.Core
 
         private void AddToAsyncDataCollection(IRuleAsync<T> rule)
         {
-            if (rule != null)
+            if (rule != null && !rule.Configuration.Skip)
             {
                 foreach (var pair in rule.Data)
                 {
@@ -278,21 +276,15 @@ namespace DotNetRuleEngine.Core
 
         private void AddToDataCollection(IRule<T> rule)
         {
-            if (rule == null) return;
-            
-            if (rule is INestedRule<T>)
+            if (rule != null && !rule.Configuration.Skip)
             {
-                foreach (var childRule in rule.To<INestedRule<T>>().GetChildRules())
+                foreach (var pair in rule.Data)
                 {
-                    AddToDataCollection(childRule);
+                    _sharedData.TryAdd(pair.Key, pair.Value);
                 }
-            }
-            foreach (var pair in rule.Data)
-            {
-                _sharedData.TryAdd(pair.Key, pair.Value);
-            }
 
-            rule.Data = _sharedData;
+                rule.Data = _sharedData;
+            }
         }
 
         private void AddToRuleResults(IRuleResult ruleResult, string ruleName)
