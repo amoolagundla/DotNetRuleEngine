@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace DotNetRuleEngine.Core
+namespace DotNetRuleEngine.Core.Interface
 {
     public interface IRule<T> : IGeneralRule<T> where T : class, new()
     {

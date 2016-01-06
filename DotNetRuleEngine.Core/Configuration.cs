@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq.Expressions;
+using DotNetRuleEngine.Core.Interface;
 
 namespace DotNetRuleEngine.Core
 {
-    public class Configuration<T>
+    public class Configuration<T> : IConfiguration<T>
     {
         public Expression<Predicate<T>> Constraint { get; set; }
 

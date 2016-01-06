@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using DotNetRuleEngine.Core.Interface;
 
 namespace DotNetRuleEngine.Core
 {
@@ -6,7 +7,7 @@ namespace DotNetRuleEngine.Core
     {
         public ConcurrentDictionary<string, object> Data { get; set; } = new ConcurrentDictionary<string, object>();
 
-        public Configuration<T> Configuration { get; set; } = new Configuration<T>();        
+        public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();        
 
         public object TryGetValue(string key)
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DotNetRuleEngine.Core
+namespace DotNetRuleEngine.Core.Interface
 {
     public interface IError
     {

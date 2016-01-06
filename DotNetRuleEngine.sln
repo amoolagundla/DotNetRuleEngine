@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "README", "README", "{DE51A0
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetRuleEngine.Core.Interface", "DotNetRuleEngine.Core.Interface\DotNetRuleEngine.Core.Interface.csproj", "{A32CE06E-62FB-41E7-81A7-6F9070EE00D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{8373D974-0709-41A8-AB5C-B48BCF45A0B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8373D974-0709-41A8-AB5C-B48BCF45A0B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8373D974-0709-41A8-AB5C-B48BCF45A0B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A32CE06E-62FB-41E7-81A7-6F9070EE00D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A32CE06E-62FB-41E7-81A7-6F9070EE00D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A32CE06E-62FB-41E7-81A7-6F9070EE00D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A32CE06E-62FB-41E7-81A7-6F9070EE00D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DotNetRuleEngine.Core.Interface;
 
 namespace DotNetRuleEngine.Core
 {

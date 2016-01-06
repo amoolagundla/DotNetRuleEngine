@@ -1,4 +1,5 @@
 using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using Product = DotNetRuleEngine.Test.Models.Product;
 
 namespace DotNetRuleEngine.Test.Rules

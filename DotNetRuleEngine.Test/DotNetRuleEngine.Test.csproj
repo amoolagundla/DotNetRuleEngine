@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DotNetRuleEngine.Test</RootNamespace>
     <AssemblyName>DotNetRuleEngine.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -16,6 +16,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -96,6 +97,10 @@
     <Compile Include="TestNestedRuleAsync.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DotNetRuleEngine.Core.Interface\DotNetRuleEngine.Core.Interface.csproj">
+      <Project>{a32ce06e-62fb-41e7-81a7-6f9070ee00d4}</Project>
+      <Name>DotNetRuleEngine.Core.Interface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DotNetRuleEngine.Core\DotNetRuleEngine.Core.csproj">
       <Project>{341DAB80-DB57-49C5-A0D8-1719C576620E}</Project>
       <Name>DotNetRuleEngine.Core</Name>

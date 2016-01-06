@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
+using DotNetRuleEngine.Core.Interface;
 
 namespace DotNetRuleEngine.Core
 {
@@ -7,7 +8,7 @@ namespace DotNetRuleEngine.Core
     {
         public ConcurrentDictionary<string, Task<object>> Data { get; set; } = new ConcurrentDictionary<string, Task<object>>();
 
-        public Configuration<T> Configuration { get; set; } = new Configuration<T>();
+        public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
 
         public async Task<object> TryGetValueAsync(string key)
         {

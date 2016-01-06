@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.AsyncRules
