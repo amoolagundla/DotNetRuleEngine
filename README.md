@@ -277,13 +277,14 @@ Rules can be nested. Derive from ```NestedRule``` or ```NestedRuleAsync``` to im
 ```csharp
     public class IsValidAmount : NestedRule<Order>
     {   
+	    public IsValidAmount()
+		{
+			AddChildRules(new AmountGreaterThan1000());
+		}
+
         public override IRuleResult Invoke(Order order)
         {
-            SetInstance(order);
-            AddRules(new AmountGreaterThan1000());
-			ruleResults = Execute();
-
-            return new RuleResult { Result = ruleResult };
+            return null;
         }
     }
 ```

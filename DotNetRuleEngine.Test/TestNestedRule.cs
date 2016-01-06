@@ -14,7 +14,7 @@ namespace DotNetRuleEngine.Test
             var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
             ruleEngineExecutor.AddRules(new ProductNestedRule());
             var ruleResults = ruleEngineExecutor.Execute();
-            var nestedRuleResult = ruleResults.FindNestedRuleResult<ProductNestedRuleC>();
+            var nestedRuleResult = ruleResults.FindRuleResult<ProductNestedRuleC>();
 
             Assert.IsNotNull(nestedRuleResult);
             Assert.AreEqual("ProductNestedRuleC", nestedRuleResult.Name);

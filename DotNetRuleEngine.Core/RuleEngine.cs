@@ -66,15 +66,9 @@ namespace DotNetRuleEngine.Core
 
             if (Rules == null || !Rules.Any()) return _asyncRuleResults.ToArray();
 
-            Initialize(Rules);
+            Initialize(Rules);            
 
-            OrderByAsynRuleExecutionOrder(Rules);
-
-            ExecuteParallelRules(Rules);
-
-            var asynRules = GetAsyncRules(Rules);
-
-            await ExecuteAsyncRules(asynRules);
+            await ExecuteAsyncRules(Rules.OfType<IRuleAsync<T>>().ToList());
 
             if (_parallelRuleResults.Any())
             {
@@ -83,9 +77,7 @@ namespace DotNetRuleEngine.Core
                 
             _parallelRuleResults.ToList().ForEach(rule =>
             {
-                var ruleResult = rule.Result;
-
-                AddToAsyncRuleResults(ruleResult, rule.GetType().Name);
+                AddToAsyncRuleResults(rule.Result, rule.GetType().Name);
             });
 
             return _asyncRuleResults.ToArray();
@@ -105,21 +97,21 @@ namespace DotNetRuleEngine.Core
             var rules = OrderByExecutionOrder(Rules);
 
             foreach (var rule in rules)
-            {
-                AddToDataCollection(rule);
-
+            {                
                 if (Execute(rule)) break;
             }
 
             return _ruleResults.ToArray();
         }
 
-        private async Task ExecuteAsyncRules(IEnumerable<IRuleAsync<T>> asynRules)
+        private async Task ExecuteAsyncRules(ICollection<IRuleAsync<T>> rules)
         {
-            foreach (var asyncRule in asynRules)
-            {
-                AddToAsyncDataCollection(asyncRule);
+            ExecuteParallelRules(rules);            
 
+            var asynRules = GetAsyncRules(rules);
+
+            foreach (var asyncRule in asynRules)
+            {               
                 await asyncRule.BeforeInvokeAsync();
 
                 if (!asyncRule.Configuration.Skip && Constrained(asyncRule.Configuration.Constraint))
@@ -127,9 +119,16 @@ namespace DotNetRuleEngine.Core
                     var ruleResult = await asyncRule.InvokeAsync(Instance);
 
                     AddToAsyncRuleResults(ruleResult, asyncRule.GetType().Name);
+
+                    if (asyncRule is INestedRuleAsync<T>)
+                    {
+                        await ExecuteAsyncRules(asyncRule.To<INestedRuleAsync<T>>().GetChildRules().ToList());
+                    }
                 }
 
                 await asyncRule.AfterInvokeAsync();
+
+                AddToAsyncDataCollection(asyncRule);
 
                 if (asyncRule.Configuration.Terminate)
                 {
@@ -140,32 +139,38 @@ namespace DotNetRuleEngine.Core
 
         private IEnumerable<IRuleAsync<T>> GetAsyncRules(IEnumerable<IGeneralRule<T>> rules)
         {
-            return rules.OfType<IRuleAsync<T>>()
+            var asyncRules = rules.OfType<IRuleAsync<T>>()
                 .Where(rule => !rule.Parallel)
                 .ToList();
+
+            OrderByAsyncRuleExecutionOrder(asyncRules);
+
+            return asyncRules;
         }        
 
         private bool Execute(IRule<T> rule)
-        {            
-            if (rule is INestedRule<T>)
-            {
-                var rules = OrderByExecutionOrder(rule.To<INestedRule<T>>().GetChildRules());
-
-                foreach (var childRule in rules)
-                {
-                    Execute(childRule);
-                }
-            }
-
+        {
             rule.BeforeInvoke();
 
             if (!rule.Configuration.Skip && Constrained(rule.Configuration.Constraint))
             {
                 var ruleResult = rule.Invoke(Instance);
-                AddToRuleResults(ruleResult, rule.GetType().Name);
+                AddToRuleResults(ruleResult, rule.GetType().Name);                
+
+                if (rule is INestedRule<T>)
+                {
+                    var rules = OrderByExecutionOrder(rule.To<INestedRule<T>>().GetChildRules());
+
+                    foreach (var childRule in rules)
+                    {
+                        Execute(childRule);
+                    }
+                }
             }
 
             rule.AfterInvoke();
+
+            AddToDataCollection(rule);
 
             return rule.Configuration.Terminate;
         }
@@ -173,8 +178,8 @@ namespace DotNetRuleEngine.Core
         private void ExecuteParallelRules(IEnumerable<IGeneralRule<T>> rules)
         {
             var parallelRules = rules.OfType<IRuleAsync<T>>()
-                .Where(rule => rule.Parallel && !rule.Configuration.ExecutionOrder.HasValue)
-                .ToList();
+                .Where(rule => rule.Parallel && 
+                !rule.Configuration.ExecutionOrder.HasValue).ToList();
 
             if (parallelRules.Any()) ExecuteParallelRule(parallelRules, _parallelRuleResults);           
         }
@@ -184,50 +189,55 @@ namespace DotNetRuleEngine.Core
         {
             foreach (var pRule in parallelRules)
             {
-                if (pRule is INestedRuleAsync<T>)
+                var parallelTask = Task.Run(() =>
                 {
-                    var parallelNestedRules = pRule.To<INestedRuleAsync<T>>().GetChildRules()
-                        .Where(rule => rule.Parallel && !rule.Configuration.ExecutionOrder.HasValue)
-                        .ToList();
-                    ExecuteParallelRule(parallelNestedRules, parallelRuleResults);
-                }
+                    return pRule.BeforeInvokeAsync()
+                        .ContinueWith(a =>
+                        {
+                            if (!pRule.Configuration.Skip && Constrained(pRule.Configuration.Constraint))
+                            {
+                                return pRule.InvokeAsync(Instance).Result;
+                            }
+                            return Task.FromResult<IRuleResult>(null).Result;
+                        })
+                        .ContinueWith(a =>
+                        {
+                            pRule.AfterInvokeAsync();
+                            return a.Result;
+                        });
+                });
 
                 AddToAsyncDataCollection(pRule);
 
-                if (!pRule.Configuration.Skip && Constrained(pRule.Configuration.Constraint))
-                {
-                    var parallelTask = Task.Run(() =>
-                    {
-                        return pRule.BeforeInvokeAsync()
-                            .ContinueWith(a => pRule.InvokeAsync(Instance).Result)
-                            .ContinueWith(a =>
-                            {
-                                pRule.AfterInvokeAsync();
-                                return a.Result;
-                            });
-                    });
+                parallelRuleResults.Add(parallelTask);
 
-                    parallelRuleResults.Add(parallelTask);
+                if (pRule is INestedRuleAsync<T>)
+                {
+                    var parallelNestedRules = pRule.To<INestedRuleAsync<T>>().GetChildRules()
+                        .Where(rule => rule.Parallel && 
+                        !rule.Configuration.ExecutionOrder.HasValue &&
+                        !rule.Configuration.Skip &&
+                        Constrained(rule.Configuration.Constraint)).ToList();
+
+                    ExecuteParallelRule(parallelNestedRules, parallelRuleResults);
                 }
             }
         }
 
-        private void OrderByAsynRuleExecutionOrder(ICollection<IGeneralRule<T>> rules)
-        {
-            var asynRules = rules.ToList();     
-                 
+        private void OrderByAsyncRuleExecutionOrder(ICollection<IRuleAsync<T>> rules)
+        {      
             var rulesWithExecutionOrder = 
-                GetRulesWithExecutionOrder<IRuleAsync<T>>(asynRules, r => r.Configuration.ExecutionOrder.HasValue);
+                GetRulesWithExecutionOrder<IRuleAsync<T>>(rules, r => r.Configuration.ExecutionOrder.HasValue);
 
             var rulesWithoutExecutionOrder = 
-                GetRulesWithoutExecutionOrder<IRuleAsync<T>>(asynRules, r => !r.Parallel && !r.Configuration.ExecutionOrder.HasValue);
+                GetRulesWithoutExecutionOrder<IRuleAsync<T>>(rules, r => !r.Parallel && !r.Configuration.ExecutionOrder.HasValue);
 
-            var orderedRules = rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
+            var orderedAsyncRules = rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
+
             rules.Clear();
-
-            foreach (var orderedRule in orderedRules)
+            foreach (var orderedAsyncRule in orderedAsyncRules)
             {
-                rules.Add(orderedRule);
+                rules.Add(orderedAsyncRule);
             }
         }
 
