@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using DotNetRuleEngine.Core.Interface;
@@ -31,9 +32,9 @@ namespace DotNetRuleEngine.Core
         {
         }
 
-        public IEnumerable<IGeneralRule<T>> GetRules()
+        public IReadOnlyCollection<IGeneralRule<T>> GetRules()
         {
-            return Rules;
+            return (IReadOnlyCollection<IGeneralRule<T>>) Rules;
         }
 
         public void AddRules(params IGeneralRule<T>[] rules)

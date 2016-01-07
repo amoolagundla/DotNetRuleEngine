@@ -46,9 +46,9 @@ namespace DotNetRuleEngine.Core
             Rules = rules;
         }
 
-        public IEnumerable<IGeneralRule<T>> GetRules()
+        public IReadOnlyCollection<IGeneralRule<T>> GetRules()
         {
-            return Rules;
+            return (IReadOnlyCollection<IGeneralRule<T>>) Rules;
         }
     }
 }

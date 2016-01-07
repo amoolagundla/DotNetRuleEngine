@@ -36,7 +36,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
         {
-            await Task.Delay(15);
+            // await Task.Delay(15);
             Debug.WriteLine("ProductNestedParallelUpdateB executed.");
             return await Task.FromResult<IRuleResult>(new RuleResult { Result = "ProductNestedParallelUpdateB executed." });
         }
@@ -47,14 +47,61 @@ namespace DotNetRuleEngine.Test.AsyncRules
         public override void Initialize()
         {
             Parallel = true;
-
+            AddRules(new ProductNestedParallelUpdateB1A());
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
         {
-            await Task.Delay(15);
+            await Task.Delay(30);
             Debug.WriteLine("ProductNestedParallelUpdateB1 executed.");
             return await Task.FromResult<IRuleResult>(new RuleResult { Result = "ProductNestedParallelUpdateB1 executed." });
+        }
+    }
+
+    public class ProductNestedParallelUpdateB1A1 : RuleAsync<Product>
+    {
+        public override void Initialize()
+        {
+            Parallel = true;
+            AddRules(new ProductNestedParallelUpdateB1A1A());
+        }
+
+        public override async Task<IRuleResult> InvokeAsync(Product type)
+        {
+            await Task.Delay(30);
+            Debug.WriteLine("ProductNestedParallelUpdateB1A1 executed.");
+            return await Task.FromResult<IRuleResult>(new RuleResult { Result = "ProductNestedParallelUpdateB1A1 executed." });
+        }
+    }
+
+    public class ProductNestedParallelUpdateB1A1A : RuleAsync<Product>
+    {
+        public override void Initialize()
+        {
+            Parallel = true;
+        }
+
+        public override async Task<IRuleResult> InvokeAsync(Product type)
+        {
+            await Task.Delay(30);
+            Debug.WriteLine("ProductNestedParallelUpdateB1A1A executed.");
+            return await Task.FromResult<IRuleResult>(new RuleResult { Result = "ProductNestedParallelUpdateB1A1S executed." });
+        }
+    }
+
+    public class ProductNestedParallelUpdateB1A : RuleAsync<Product>
+    {
+        public override void Initialize()
+        {
+            Parallel = true;
+            AddRules(new ProductNestedParallelUpdateB1A1());
+        }
+
+        public override async Task<IRuleResult> InvokeAsync(Product type)
+        {
+            await Task.Delay(500);
+            Debug.WriteLine("ProductNestedParallelUpdateB1A executed.");
+            return await Task.FromResult<IRuleResult>(new RuleResult { Result = "ProductNestedParallelUpdateB1A executed." });
         }
     }
 
@@ -68,7 +115,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
         {
-            await Task.Delay(10);
+            await Task.Delay(20);
             Debug.WriteLine("ProductNestedParallelUpdateB2 executed.");
             return await Task.FromResult<IRuleResult>(new RuleResult { Result = "ProductNestedParallelUpdateB2 executed." });
         }
@@ -84,7 +131,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
         {
-            await Task.Delay(20);
+            await Task.Delay(300);
             Debug.WriteLine("ProductNestedParallelUpdateC executed.");
             return await Task.FromResult<IRuleResult>(new RuleResult { Result = "ProductNestedParallelUpdateC executed." });
         }
