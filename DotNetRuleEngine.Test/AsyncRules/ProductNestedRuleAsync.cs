@@ -5,11 +5,11 @@ using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.AsyncRules
 {
-    class ProductNestedRuleAsync : NestedRuleAsync<Product>
+    class ProductNestedRuleAsync : RuleAsync<Product>
     {
         public ProductNestedRuleAsync()
         {
-            AddChildRules(new ProductNestedRuleAsyncA(), new ProductNestedRuleAsyncB());
+            AddRules(new ProductNestedRuleAsyncA(), new ProductNestedRuleAsyncB());
         }
         public override async Task<IRuleResult> InvokeAsync(Product product)
         {

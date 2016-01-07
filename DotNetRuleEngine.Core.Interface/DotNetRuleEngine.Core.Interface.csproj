@@ -44,8 +44,6 @@
     <Compile Include="IConfiguration.cs" />
     <Compile Include="IError.cs" />
     <Compile Include="IGeneralRule.cs" />
-    <Compile Include="INestedRule.cs" />
-    <Compile Include="INestedRuleAsync.cs" />
     <Compile Include="IRule.cs" />
     <Compile Include="IRuleAsync.cs" />
     <Compile Include="IRuleResult.cs" />

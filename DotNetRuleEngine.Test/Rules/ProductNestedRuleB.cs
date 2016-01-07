@@ -4,7 +4,7 @@ using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.Rules
 {
-    class ProductNestedRuleB : NestedRule<Product>
+    class ProductNestedRuleB : Rule<Product>
     {
         public override void Initialize()
         {
@@ -12,7 +12,7 @@ namespace DotNetRuleEngine.Test.Rules
         }
         public ProductNestedRuleB()
         {
-            AddChildRules(new ProductNestedRuleC());
+            AddRules(new ProductNestedRuleC());
         }
         public override IRuleResult Invoke(Product product)
         {           

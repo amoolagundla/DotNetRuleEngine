@@ -201,12 +201,37 @@ The return value of Rule/RuleAsync.
 
 #### Features ####
 
+##### Initialize (a.k.a Lazy Constructor) #####
+Always executes. ( Most of the configuration options must be initialized in ```Initialize``` or ```ctor```. Specifically ```Skip```, ```Constraint```, and ```ExecutionOrder```.
+
+###### Example ######
+```csharp
+    public class IsValidAmount : Rule<Order>
+    {   
+        public override IRuleResult Invoke(Order order)
+        {
+            if (order.Amount > 50.0m)
+            {
+                order.FreeShipping = true; 
+            }
+
+            return null;
+        }
+
+        public override void Initialize()
+        {
+			Skip = true;
+        }
+    }
+```
+
 ##### Execution Order #####
 
-Rules can specify ```ExecutionOrder``` (asc to desc) rather than getting executed in the order they've been added to ```AddRules``` method.
+Rules can specify ```ExecutionOrder``` (ordered by asc to desc) rather than getting executed in the order they've been added to the rules.
 
-*if both* ```Parallel``` *and* ```ExecutionOrder``` *specified for async rule, then the parallelization gets ignored.*
+*Must be set in Initialize method or ctor.*
 
+*if both* ```Parallel``` *and* ```ExecutionOrder``` *specified (applies to async rules only), then the parallelization will get ignored.*
 
 In the proceeding example, there are two rules. The order of execution would be ```ValidateProductAmount```, and then the ```ValidateProductName```
 
@@ -252,7 +277,7 @@ If ```Parallel``` not specified, async rules executed in the order they are adde
 ```csharp
     public class IsValidAmount : RuleAsync<Order>
     {   
- 		public override void BeforeInvoke()
+ 		public override void Initialize()
         {
 			Parallel = true;
         }
@@ -304,7 +329,7 @@ Rules can be nested. Derive from ```NestedRule``` or ```NestedRuleAsync``` to im
 ```
 
 ##### Before/After Invoke #####
-Executed before and after the Invoke method.
+Executes before and after the ```Invoke``` method. It won't be executed if ```Skip``` set to true or ```Constraint``` predicate returns false.
 
 ###### Example ######
 ```csharp
@@ -337,7 +362,7 @@ Executed before and after the Invoke method.
 ```
 
 ##### Skip #####
-Marks the rule to be skipped. Invoke method will not be executed. *Must be set before Invoke method executed.*
+Marks the rule to be skipped. Invoke method will not be executed. *Must be set in Initialize method or ctor.*
 
 ###### Example ######
 ```csharp
@@ -353,7 +378,7 @@ Marks the rule to be skipped. Invoke method will not be executed. *Must be set b
             return null;
         }
 
-        public override void BeforeInvoke()
+        public override void Initialize()
         {
 			Configuration.Skip = true;
         }
@@ -377,7 +402,7 @@ Terminates execution of the remaining rules.
             return null;
         }
 
-        public override void AfterInvoke()
+        public override void Initialize()
         {
 			Configuration.Terminate = true;
         }
@@ -385,7 +410,7 @@ Terminates execution of the remaining rules.
 ```
 
 ##### Constraint #####
-If evaluated to false, Invoke method will not be executed. *Must be set before Invoke method executed.*
+If evaluated to false, Invoke method will not be executed. *Must be set in Initialize method or ctor.*
 
 ###### Example ######
 ```csharp
@@ -400,7 +425,7 @@ If evaluated to false, Invoke method will not be executed. *Must be set before I
 
         }
 
-        public override void BeforeInvoke()
+        public override void Initialize()
         {
 			Configuration.Constraint = order => order.Amount > 1000;
         }

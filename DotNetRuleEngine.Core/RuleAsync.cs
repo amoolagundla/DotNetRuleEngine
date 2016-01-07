@@ -1,4 +1,6 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DotNetRuleEngine.Core.Interface;
 
@@ -6,9 +8,13 @@ namespace DotNetRuleEngine.Core
 {
     public abstract class RuleAsync<T> : IRuleAsync<T> where T : class, new()
     {
+        private IList<IGeneralRule<T>> Rules { get; set; } = new List<IGeneralRule<T>>();
+
         public ConcurrentDictionary<string, Task<object>> Data { get; set; } = new ConcurrentDictionary<string, Task<object>>();
 
-        public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
+        public bool IsNested => Rules.Any();
+
+        public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();        
 
         public async Task<object> TryGetValueAsync(string key)
         {
@@ -21,6 +27,20 @@ namespace DotNetRuleEngine.Core
             return Data.TryAdd(key, value);
         }
 
+        public virtual void Initialize()
+        {
+        }
+
+        public IEnumerable<IGeneralRule<T>> GetRules()
+        {
+            return Rules;
+        }
+
+        public void AddRules(params IGeneralRule<T>[] rules)
+        {
+            Rules = rules;
+        }
+
         public virtual async Task BeforeInvokeAsync()
         {
             await Task.FromResult<object>(null);
@@ -31,13 +51,8 @@ namespace DotNetRuleEngine.Core
             await Task.FromResult<object>(null);
         }
 
-        public virtual void Initialize()
-        {
-        }
-
         public abstract Task<IRuleResult> InvokeAsync(T type);
-        
 
-        public bool Parallel { get; set; }        
+        public bool Parallel { get; set; }
     }
 }

@@ -53,6 +53,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AsyncRules\ProductNestedParallelUpdate.cs" />
     <Compile Include="AsyncRules\ProductParallelUpdateDescriptionRuleAsync.cs" />
     <Compile Include="AsyncRules\ProductParallelUpdateNameRuleAsync.cs" />
     <Compile Include="AsyncRules\ProductParallelUpdatePriceRuleAsync.cs" />

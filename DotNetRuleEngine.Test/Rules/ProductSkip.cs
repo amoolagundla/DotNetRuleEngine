@@ -6,7 +6,7 @@ namespace DotNetRuleEngine.Test.Rules
 {
     class ProductSkip : Rule<Product>
     {
-        public override void BeforeInvoke()
+        public override void Initialize()
         {
             Configuration.Skip = true;
         }

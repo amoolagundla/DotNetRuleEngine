@@ -30,5 +30,20 @@ namespace DotNetRuleEngine.Test
             Assert.AreEqual(0.0m, product.Price);
             Assert.AreEqual("Description", product.Description);
         }
+
+        [TestMethod]
+        public void TestNestedParallelRules()
+        {
+            var product = new Product();
+            var engineExecutor = new RuleEngineExecutor<Product>(product);
+            var ruleEngineExecutor = engineExecutor;
+
+            ruleEngineExecutor.AddRules(
+                new ProductNestedParallelUpdateA(),
+                new ProductNestedParallelUpdateB(),
+                new ProductNestedParallelUpdateC());
+
+            var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
+        }
     }
 }

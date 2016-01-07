@@ -44,11 +44,9 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="Error.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="NestedRule.cs" />
-    <Compile Include="NestedRuleAsync.cs" />
-    <Compile Include="RuleResult.cs" />
     <Compile Include="Rule.cs" />
     <Compile Include="RuleAsync.cs" />
+    <Compile Include="RuleResult.cs" />
     <Compile Include="RuleEngine.cs" />
     <Compile Include="RuleEngineExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

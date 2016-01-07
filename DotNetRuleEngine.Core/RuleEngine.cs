@@ -104,30 +104,33 @@ namespace DotNetRuleEngine.Core
             return _ruleResults.ToArray();
         }
 
-        private async Task ExecuteAsyncRules(ICollection<IRuleAsync<T>> rules)
+        private async Task ExecuteAsyncRules(IEnumerable<IGeneralRule<T>> rules)
         {
-            ExecuteParallelRules(rules);            
+            var ruleList = rules.ToList();
 
-            var asynRules = GetAsyncRules(rules);
+            ExecuteParallelRules(ruleList);            
+
+            var asynRules = GetAsyncRules(ruleList);
 
             foreach (var asyncRule in asynRules)
             {
-                AddToAsyncDataCollection(asyncRule);
-                await asyncRule.BeforeInvokeAsync();
-
                 if (!asyncRule.Configuration.Skip && Constrained(asyncRule.Configuration.Constraint))
                 {
-                    var ruleResult = await asyncRule.InvokeAsync(Instance);
+                    AddToAsyncDataCollection(asyncRule);
+
+                    await asyncRule.BeforeInvokeAsync();
+
+                    var ruleResult = await asyncRule.InvokeAsync(Instance);                    
 
                     AddToAsyncRuleResults(ruleResult, asyncRule.GetType().Name);
 
-                    if (asyncRule is INestedRuleAsync<T>)
+                    if (asyncRule.IsNested)
                     {
-                        await ExecuteAsyncRules(asyncRule.To<INestedRuleAsync<T>>().GetChildRules().ToList());
+                        await ExecuteAsyncRules(asyncRule.GetRules());
                     }
-                }
 
-                await asyncRule.AfterInvokeAsync();
+                    await asyncRule.AfterInvokeAsync();
+                }
 
                 if (asyncRule.Configuration.Terminate)
                 {
@@ -145,21 +148,30 @@ namespace DotNetRuleEngine.Core
             OrderByAsyncRuleExecutionOrder(asyncRules);
 
             return asyncRules;
-        }        
+        }
+
+        private IEnumerable<IRuleAsync<T>> GetParallelRules(IEnumerable<IGeneralRule<T>> rules)
+        {
+            var parallelRules = rules.OfType<IRuleAsync<T>>()
+                 .Where(rule => rule.Parallel &&
+                 !rule.Configuration.ExecutionOrder.HasValue).ToList();
+
+            return parallelRules;
+        }
 
         private bool Execute(IRule<T> rule)
         {
-            AddToDataCollection(rule);
-            rule.BeforeInvoke();
-
             if (!rule.Configuration.Skip && Constrained(rule.Configuration.Constraint))
             {
+                AddToDataCollection(rule);
+                rule.BeforeInvoke();
+
                 var ruleResult = rule.Invoke(Instance);
                 AddToRuleResults(ruleResult, rule.GetType().Name);                
 
-                if (rule is INestedRule<T>)
+                if (rule.IsNested)
                 {
-                    var rules = OrderByExecutionOrder(rule.To<INestedRule<T>>().GetChildRules());
+                    var rules = OrderByExecutionOrder(rule.GetRules());
 
                     foreach (var childRule in rules)
                     {
@@ -175,9 +187,7 @@ namespace DotNetRuleEngine.Core
 
         private void ExecuteParallelRules(IEnumerable<IGeneralRule<T>> rules)
         {
-            var parallelRules = rules.OfType<IRuleAsync<T>>()
-                .Where(rule => rule.Parallel && 
-                !rule.Configuration.ExecutionOrder.HasValue).ToList();
+            var parallelRules = GetParallelRules(rules).ToList();
 
             if (parallelRules.Any()) ExecuteParallelRule(parallelRules, _parallelRuleResults);           
         }
@@ -187,37 +197,28 @@ namespace DotNetRuleEngine.Core
         {
             foreach (var pRule in parallelRules)
             {
-                var parallelTask = Task.Run(() =>
+                if (!pRule.Configuration.Skip && Constrained(pRule.Configuration.Constraint))
                 {
-                    return pRule.BeforeInvokeAsync()
-                        .ContinueWith(a =>
-                        {
-                            if (!pRule.Configuration.Skip && Constrained(pRule.Configuration.Constraint))
+                    AddToAsyncDataCollection(pRule);
+                    var parallelTask = Task.Run(() =>
+                    {
+                        return pRule.BeforeInvokeAsync()
+                            .ContinueWith(a => pRule.InvokeAsync(Instance).Result)                    
+                            .ContinueWith(a =>
                             {
-                                return pRule.InvokeAsync(Instance).Result;
-                            }
-                            return Task.FromResult<IRuleResult>(null).Result;
-                        })
-                        .ContinueWith(a =>
-                        {
-                            pRule.AfterInvokeAsync();
-                            return a.Result;
-                        });
-                });
+                                if (pRule.IsNested)
+                                {
+                                    var parallelNestedRules = GetParallelRules(pRule.GetRules());
 
-                AddToAsyncDataCollection(pRule);
+                                    ExecuteParallelRule(parallelNestedRules, parallelRuleResults);
+                                }
 
-                parallelRuleResults.Add(parallelTask);
+                                pRule.AfterInvokeAsync();
+                                return a.Result;
+                            });
+                    });
 
-                if (pRule is INestedRuleAsync<T>)
-                {
-                    var parallelNestedRules = pRule.To<INestedRuleAsync<T>>().GetChildRules()
-                        .Where(rule => rule.Parallel && 
-                        !rule.Configuration.ExecutionOrder.HasValue &&
-                        !rule.Configuration.Skip &&
-                        Constrained(rule.Configuration.Constraint)).ToList();
-
-                    ExecuteParallelRule(parallelNestedRules, parallelRuleResults);
+                    parallelRuleResults.Add(parallelTask);
                 }
             }
         }
@@ -335,11 +336,12 @@ namespace DotNetRuleEngine.Core
         {
             foreach (var rule in rules)
             {
-                if (rule is INestedRule<T>)
-                {
-                    Initialize(rule.To<INestedRule<T>>().GetChildRules());
-                }
                 rule.Initialize();
+
+                if (rule.IsNested)
+                {
+                    Initialize(rule.GetRules());
+                }                
             }
         }
     }

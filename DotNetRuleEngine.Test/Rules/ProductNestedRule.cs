@@ -4,11 +4,11 @@ using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.Rules
 {
-    class ProductNestedRule : NestedRule<Product>
+    class ProductNestedRule : Rule<Product>
     {
         public ProductNestedRule()
         {
-            AddChildRules(new ProductNestedRuleA(), new ProductNestedRuleB());
+            AddRules(new ProductNestedRuleA(), new ProductNestedRuleB());
         }
         public override IRuleResult Invoke(Product product)
         {

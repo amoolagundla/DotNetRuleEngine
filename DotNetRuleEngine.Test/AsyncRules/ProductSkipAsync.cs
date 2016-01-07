@@ -7,10 +7,9 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     class ProductSkipAsync : RuleAsync<Product>
     {
-        public override Task BeforeInvokeAsync()
+        public override void Initialize()
         {
             Configuration.Skip = true;
-            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product product)
