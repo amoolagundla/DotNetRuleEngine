@@ -8,7 +8,7 @@ namespace DotNetRuleEngine.Core.Interface
 
         IConfiguration<T> Configuration { get; set;  }        
 
-        IReadOnlyCollection<IGeneralRule<T>> GetRules();
+        ICollection<IGeneralRule<T>> GetRules();
 
         void AddRules(params IGeneralRule<T>[] rules);
     }

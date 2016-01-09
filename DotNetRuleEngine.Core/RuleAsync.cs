@@ -26,9 +26,9 @@ namespace DotNetRuleEngine.Core
             RuleDataManager.GetInstance().AddOrUpdateAsync(key, value, Configuration);
         }
 
-        public IReadOnlyCollection<IGeneralRule<T>> GetRules()
+        public ICollection<IGeneralRule<T>> GetRules()
         {
-            return (IReadOnlyCollection<IGeneralRule<T>>)Rules;
+            return Rules;
         }
 
         public void AddRules(params IGeneralRule<T>[] rules)

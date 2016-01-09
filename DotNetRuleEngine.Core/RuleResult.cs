@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DotNetRuleEngine.Core.Interface;
 
@@ -19,9 +20,14 @@ namespace DotNetRuleEngine.Core
 
         public IError Error { get; set; }
 
-        public static async Task<IRuleResult> Null()
+        public static IRuleResult Null()
         {
-            return await Task.FromResult<IRuleResult>(null);
+            return null;
+        }
+
+        public static async Task<IRuleResult> Create(RuleResult ruleResult)
+        {
+            return await Task.FromResult(ruleResult);
         }
     }
 }
