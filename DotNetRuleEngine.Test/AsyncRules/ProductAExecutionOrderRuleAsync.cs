@@ -7,9 +7,10 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     public class ProductAExecutionOrderRuleAsync : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Configuration.ExecutionOrder = 2;
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)

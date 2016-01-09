@@ -8,9 +8,11 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     class ProductParallelUpdateNameRuleAsync : RuleAsync<Product>
     {
-        public ProductParallelUpdateNameRuleAsync()
+        public override Task InitializeAsync()
         {
             Parallel = true;
+
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product product)
@@ -18,6 +20,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             await Task.Delay(15);
             product.Name = "Product";
             Debug.WriteLine("ProductParallelUpdateNameRuleAsync");
+
             return await Task.FromResult<IRuleResult>(null);
         }
     }

@@ -5,9 +5,8 @@ namespace DotNetRuleEngine.Core.Interface
     public interface IGeneralRule<T> where T : class, new()
     { 
         bool IsNested { get; }
-        IConfiguration<T> Configuration { get; set;  }
 
-        void Initialize();
+        IConfiguration<T> Configuration { get; set;  }        
 
         IReadOnlyCollection<IGeneralRule<T>> GetRules();
 

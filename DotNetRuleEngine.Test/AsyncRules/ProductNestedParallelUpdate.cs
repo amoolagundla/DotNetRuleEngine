@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Core.Interface;
@@ -12,10 +8,11 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     public class ProductNestedParallelUpdateA : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Parallel = true;
 
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
@@ -28,10 +25,12 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
     public class ProductNestedParallelUpdateB : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Parallel = true;
             AddRules(new ProductNestedParallelUpdateB1(), new ProductNestedParallelUpdateB2());
+
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
@@ -44,10 +43,12 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
     public class ProductNestedParallelUpdateB1 : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Parallel = true;
             AddRules(new ProductNestedParallelUpdateB1A());
+
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
@@ -60,10 +61,12 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
     public class ProductNestedParallelUpdateB1A1 : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Parallel = true;
             AddRules(new ProductNestedParallelUpdateB1A1A());
+
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
@@ -76,9 +79,10 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
     public class ProductNestedParallelUpdateB1A1A : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Parallel = true;
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
@@ -91,10 +95,12 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
     public class ProductNestedParallelUpdateB1A : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Parallel = true;
             AddRules(new ProductNestedParallelUpdateB1A1());
+
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
@@ -107,10 +113,11 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
     public class ProductNestedParallelUpdateB2 : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Parallel = true;
 
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
@@ -123,10 +130,11 @@ namespace DotNetRuleEngine.Test.AsyncRules
 
     public class ProductNestedParallelUpdateC : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Parallel = true;
 
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)

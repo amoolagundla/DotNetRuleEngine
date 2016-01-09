@@ -7,10 +7,13 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     class ProductParallelUpdateDescriptionRuleAsync : RuleAsync<Product>
     {
-        public ProductParallelUpdateDescriptionRuleAsync()
+        public override Task InitializeAsync()
         {
             Parallel = true;
+
+            return Task.FromResult<object>(null);
         }
+
         public override async Task<IRuleResult> InvokeAsync(Product product)
         {
             await Task.Delay(10);

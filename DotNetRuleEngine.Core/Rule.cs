@@ -1,13 +1,10 @@
-﻿using System.Collections.Concurrent;
-using System.Linq;
+﻿using System.Linq;
 using DotNetRuleEngine.Core.Interface;
+using System.Collections.Generic;
 
 namespace DotNetRuleEngine.Core
 {
-    using System.Collections.Generic;
-
-    public abstract class Rule<T> : IRule<T>
-        where T : class, new()
+    public abstract class Rule<T> : IRule<T> where T : class, new()
     {
         private IList<IGeneralRule<T>> Rules { get; set; } = new List<IGeneralRule<T>>();
 
@@ -15,7 +12,25 @@ namespace DotNetRuleEngine.Core
 
         public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
 
-        public ConcurrentDictionary<string, object> Data { get; set; } = new ConcurrentDictionary<string, object>();
+        public object TryGetValue(string key)
+        {
+            return RuleDataManager.GetInstance().GetValue(key, Configuration);
+        }
+
+        public void TryAdd(string key, object value)
+        {
+            RuleDataManager.GetInstance().AddOrUpdate(key, value, Configuration);
+        }
+
+        public IReadOnlyCollection<IGeneralRule<T>> GetRules()
+        {
+            return (IReadOnlyCollection<IGeneralRule<T>>)Rules;
+        }
+
+        public void AddRules(params IGeneralRule<T>[] rules)
+        {
+            Rules = rules;
+        }
 
         public virtual void Initialize()
         {
@@ -29,26 +44,5 @@ namespace DotNetRuleEngine.Core
         }
 
         public abstract IRuleResult Invoke(T type);
-        
-        public object TryGetValue(string key)
-        {
-            object name;
-            return Data.TryGetValue(key, out name) ? name : null;
-        }
-
-        public bool TryAdd(string key, object value)
-        {
-            return Data.TryAdd(key, value);
-        }
-
-        public void AddRules(params IGeneralRule<T>[] rules)
-        {
-            Rules = rules;
-        }
-
-        public IReadOnlyCollection<IGeneralRule<T>> GetRules()
-        {
-            return (IReadOnlyCollection<IGeneralRule<T>>) Rules;
-        }
     }
 }

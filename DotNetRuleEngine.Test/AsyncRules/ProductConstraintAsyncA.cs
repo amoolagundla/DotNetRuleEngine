@@ -7,9 +7,11 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     class ProductConstraintAsyncA : RuleAsync<Product>
     {
-        public override void Initialize()
+        public override Task InitializeAsync()
         {
             Configuration.Constraint = product => product.Description == "Description";
+
+            return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product product)

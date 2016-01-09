@@ -8,15 +8,19 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     class ProductParallelUpdatePriceRuleAsync : RuleAsync<Product>
     {
-        public ProductParallelUpdatePriceRuleAsync()
+        public override Task InitializeAsync()
         {
             Parallel = true;
+
+            return Task.FromResult<object>(null);
         }
+
         public override async Task<IRuleResult> InvokeAsync(Product product)
         {
             await Task.Delay(5);
             product.Price = 0.0m;
             Debug.WriteLine("ProductParallelUpdatePriceRuleAsync");
+
             return await Task.FromResult<IRuleResult>(null);
         }
     }

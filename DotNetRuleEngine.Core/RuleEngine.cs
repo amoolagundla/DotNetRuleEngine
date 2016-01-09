@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,8 +13,7 @@ namespace DotNetRuleEngine.Core
     /// <typeparam name="T"></typeparam>
     public abstract class RuleEngine<T> where T : class, new()
     {
-        private readonly ConcurrentDictionary<string, object> _sharedData = new ConcurrentDictionary<string, object>();
-        private readonly ConcurrentDictionary<string, Task<object>> _sharedDataAsync = new ConcurrentDictionary<string, Task<object>>();
+        private readonly Guid _ruleEngineId = Guid.NewGuid();
         private readonly ICollection<IRuleResult> _ruleResults = new List<IRuleResult>();
         private readonly ICollection<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
         private readonly ICollection<Task<IRuleResult>> _parallelRuleResults = new List<Task<IRuleResult>>();
@@ -44,7 +42,7 @@ namespace DotNetRuleEngine.Core
         /// <param name="rules">Rule(s) list.</param>
         public virtual void AddRules(params IGeneralRule<T>[] rules)
         {
-            Rules = rules.ToList();           
+            Rules = rules.ToList();
         }
 
         /// <summary>
@@ -66,14 +64,18 @@ namespace DotNetRuleEngine.Core
 
             if (Rules == null || !Rules.Any()) return _asyncRuleResults.ToArray();
 
-            Initialize(Rules);
+            var asynRules = GetAsyncRules(Rules);
 
-            await ExecuteAsyncRules(Rules.OfType<IRuleAsync<T>>().ToList());
+            await InitializeAsync(asynRules);
+
+            ExecuteParallelRules(asynRules);
 
             if (_parallelRuleResults.Any())
             {
                 await Task.WhenAll(_parallelRuleResults);
             }
+
+            await ExecuteAsyncRules(OrderByAsyncRuleExecutionOrder(asynRules));
 
             _parallelRuleResults.ToList().ForEach(rule =>
             {
@@ -104,21 +106,15 @@ namespace DotNetRuleEngine.Core
             return _ruleResults.ToArray();
         }
 
-        private async Task ExecuteAsyncRules(IReadOnlyCollection<IGeneralRule<T>> rules)
+        private async Task ExecuteAsyncRules(IReadOnlyCollection<IRuleAsync<T>> rules)
         {
-            ExecuteParallelRules(rules);
-
-            var asynRules = GetAsyncRules(rules);
-
-            foreach (var asyncRule in asynRules)
+            foreach (var asyncRule in rules)
             {
-                SynchronizeAsyncDataCollection(asyncRule);
-
                 if (!asyncRule.Configuration.Skip && Constrained(asyncRule.Configuration.Constraint))
-                {                    
+                {
                     if (asyncRule.IsNested)
                     {
-                        await ExecuteAsyncRules(asyncRule.GetRules());
+                        await ExecuteAsyncRules(OrderByAsyncRuleExecutionOrder(GetAsyncRules(asyncRule.GetRules()).ToList()));
                     }
 
                     await asyncRule.BeforeInvokeAsync();
@@ -128,8 +124,6 @@ namespace DotNetRuleEngine.Core
                     AddToAsyncRuleResults(ruleResult, asyncRule.GetType().Name);
 
                     await asyncRule.AfterInvokeAsync();
-
-                    SynchronizeAsyncDataCollection(asyncRule);
                 }
 
                 if (asyncRule.Configuration.Terminate)
@@ -139,32 +133,10 @@ namespace DotNetRuleEngine.Core
             }
         }
 
-        private IEnumerable<IRuleAsync<T>> GetAsyncRules(IEnumerable<IGeneralRule<T>> rules)
-        {
-            var asyncRules = rules.OfType<IRuleAsync<T>>()
-                .Where(rule => !rule.Parallel)
-                .ToList();
-
-            OrderByAsyncRuleExecutionOrder(asyncRules);
-
-            return asyncRules;
-        }
-
-        private IEnumerable<IRuleAsync<T>> GetParallelRules(IEnumerable<IGeneralRule<T>> rules)
-        {
-            var parallelRules = rules.OfType<IRuleAsync<T>>()
-                 .Where(rule => rule.Parallel &&
-                 !rule.Configuration.ExecutionOrder.HasValue).ToList();
-
-            return parallelRules;
-        }
-
         private bool Execute(IRule<T> rule)
         {
             if (!rule.Configuration.Skip && Constrained(rule.Configuration.Constraint))
             {
-                SynchronizeDataCollection(rule);
-
                 if (rule.IsNested)
                 {
                     var rules = OrderByExecutionOrder(rule.GetRules());
@@ -182,51 +154,35 @@ namespace DotNetRuleEngine.Core
             }
 
             rule.AfterInvoke();
-            SynchronizeDataCollection(rule);
 
             return rule.Configuration.Terminate;
         }
 
         private void ExecuteParallelRules(IEnumerable<IGeneralRule<T>> rules)
         {
-            var parallelRules = GetParallelRules(rules).ToList();
+            var parallelRules = GetParallelRules(rules);
 
-            if (parallelRules.Any()) ExecuteParallelRule(parallelRules, _parallelRuleResults);
-        }
-
-        private void ExecuteParallelRule(IEnumerable<IRuleAsync<T>> parallelRules,
-            ICollection<Task<IRuleResult>> parallelRuleResults)
-        {
             foreach (var pRule in parallelRules)
             {
                 if (!pRule.Configuration.Skip && Constrained(pRule.Configuration.Constraint))
                 {
-                    SynchronizeAsyncDataCollection(pRule);
-
-                    if (pRule.IsNested)
-                    {
-                        var parallelNestedRules = GetParallelRules(pRule.GetRules());
-                        ExecuteParallelRule(parallelNestedRules, parallelRuleResults);
-                    }
-
                     var parallelTask = Task.Run(async () =>
-                    {                        
+                    {
                         await pRule.BeforeInvokeAsync();
-                        var ruleResult = await pRule.InvokeAsync(Instance);
-                        
-                        await pRule.AfterInvokeAsync();
 
-                        SynchronizeAsyncDataCollection(pRule);
+                        var ruleResult = await pRule.InvokeAsync(Instance);
+
+                        await pRule.AfterInvokeAsync();
 
                         return ruleResult;
                     });
 
-                    parallelRuleResults.Add(parallelTask);
+                    _parallelRuleResults.Add(parallelTask);
                 }
             }
         }
 
-        private void OrderByAsyncRuleExecutionOrder(ICollection<IRuleAsync<T>> rules)
+        private IReadOnlyCollection<IRuleAsync<T>> OrderByAsyncRuleExecutionOrder(IReadOnlyCollection<IRuleAsync<T>> rules)
         {
             var rulesWithExecutionOrder =
                 GetRulesWithExecutionOrder<IRuleAsync<T>>(rules, r => r.Configuration.ExecutionOrder.HasValue);
@@ -234,14 +190,7 @@ namespace DotNetRuleEngine.Core
             var rulesWithoutExecutionOrder =
                 GetRulesWithoutExecutionOrder<IRuleAsync<T>>(rules, r => !r.Parallel && !r.Configuration.ExecutionOrder.HasValue);
 
-            var orderedAsyncRules = rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
-
-            rules.Clear();
-
-            foreach (var orderedAsyncRule in orderedAsyncRules)
-            {
-                rules.Add(orderedAsyncRule);
-            }
+            return rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder).ToList();
         }
 
         private IEnumerable<IRule<T>> OrderByExecutionOrder(IEnumerable<IGeneralRule<T>> rules)
@@ -264,44 +213,6 @@ namespace DotNetRuleEngine.Core
         private bool Constrained(Expression<Predicate<T>> predicate)
         {
             return predicate == null || predicate.Compile().Invoke(Instance);
-        }
-
-        private void SynchronizeAsyncDataCollection(IRuleAsync<T> rule)
-        {
-            if (rule != null && !rule.Configuration.Skip)
-            {
-                foreach (var pair in rule.Data)
-                {
-                    _sharedDataAsync.TryAdd(pair.Key, pair.Value);
-                }
-
-                foreach (var key in _sharedDataAsync.Keys)
-                {
-                    if (!rule.Data.TryAdd(key, _sharedDataAsync[key]))
-                    {
-                        rule.Data.AddOrUpdate(key, v =>_sharedDataAsync[key], (k, v) => rule.Data[key]);
-                    }
-                }
-            }
-        }
-
-        private void SynchronizeDataCollection(IRule<T> rule)
-        {
-            if (rule != null && !rule.Configuration.Skip)
-            {
-                foreach (var pair in rule.Data)
-                {
-                    _sharedData.TryAdd(pair.Key, pair.Value);
-                }
-
-                foreach (var key in _sharedData.Keys)
-                {
-                    if (!rule.Data.TryAdd(key, _sharedData[key]))
-                    {
-                        rule.Data.AddOrUpdate(key, v => _sharedData[key], (k, v) => rule.Data[key]);
-                    }
-                }
-            }
         }
 
         private void AddToRuleResults(IRuleResult ruleResult, string ruleName)
@@ -327,7 +238,7 @@ namespace DotNetRuleEngine.Core
             return ruleResult;
         }
 
-        private IEnumerable<TK> GetRulesWithoutExecutionOrder<TK>(IEnumerable<IGeneralRule<T>> rules,
+        private IReadOnlyCollection<TK> GetRulesWithoutExecutionOrder<TK>(IEnumerable<IGeneralRule<T>> rules,
             Func<TK, bool> condition = null) where TK : IGeneralRule<T>
         {
             condition = condition ?? (k => true);
@@ -336,7 +247,7 @@ namespace DotNetRuleEngine.Core
                 .Where(condition).ToList();
         }
 
-        private IEnumerable<TK> GetRulesWithExecutionOrder<TK>(IEnumerable<IGeneralRule<T>> rules,
+        private IReadOnlyCollection<TK> GetRulesWithExecutionOrder<TK>(IEnumerable<IGeneralRule<T>> rules,
             Func<TK, bool> condition = null) where TK : IGeneralRule<T>
         {
             condition = condition ?? (k => true);
@@ -348,15 +259,66 @@ namespace DotNetRuleEngine.Core
                 .ToList();
         }
 
+        private IReadOnlyCollection<IRuleAsync<T>> GetAsyncRules(IEnumerable<IGeneralRule<T>> rules)
+        {
+            var asyncRules = rules.OfType<IRuleAsync<T>>()
+                .Where(rule => !rule.Parallel)
+                .ToList();
+
+            OrderByAsyncRuleExecutionOrder(asyncRules);
+
+            return asyncRules;
+        }
+
+        private IReadOnlyCollection<IRuleAsync<T>> GetParallelRules(IEnumerable<IGeneralRule<T>> rules)
+        {
+            return GetParallelRules(rules, new List<IRuleAsync<T>>());
+        }
+
+        private IReadOnlyCollection<IRuleAsync<T>> GetParallelRules(IEnumerable<IGeneralRule<T>> rules,
+            ICollection<IRuleAsync<T>> parallelRules)
+        {
+            foreach (var rule in rules.OfType<IRuleAsync<T>>())
+            {
+                if (rule.IsNested)
+                {
+                    GetParallelRules(rule.GetRules(), parallelRules);
+                }
+                if (rule.Parallel && !rule.Configuration.ExecutionOrder.HasValue)
+                {
+                    parallelRules.Add(rule);
+                }
+            }
+
+            return parallelRules.ToList();
+        }
+
         private void Initialize(IEnumerable<IGeneralRule<T>> rules)
         {
-            foreach (var rule in rules)
+            foreach (var rule in rules.OfType<IRule<T>>())
             {
+                rule.Configuration = new RuleEngineConfiguration<T>(rule.Configuration) { RuleEngineId = _ruleEngineId };
+
                 rule.Initialize();
 
                 if (rule.IsNested)
                 {
                     Initialize(rule.GetRules());
+                }
+            }
+        }
+
+        private async Task InitializeAsync(IEnumerable<IGeneralRule<T>> rules)
+        {
+            foreach (var rule in rules.OfType<IRuleAsync<T>>())
+            {
+                rule.Configuration = new RuleEngineConfiguration<T>(rule.Configuration) { RuleEngineId = _ruleEngineId };
+
+                await rule.InitializeAsync();
+
+                if (rule.IsNested)
+                {
+                    await InitializeAsync(rule.GetRules());
                 }
             }
         }

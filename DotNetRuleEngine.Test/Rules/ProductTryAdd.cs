@@ -6,7 +6,7 @@ namespace DotNetRuleEngine.Test.Rules
 {
     class ProductTryAdd : Rule<Product>
     {
-        public ProductTryAdd()
+        public override void Initialize()
         {
             TryAdd("Description1", "Product Description1");
         }

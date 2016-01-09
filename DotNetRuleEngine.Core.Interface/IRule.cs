@@ -1,10 +1,8 @@
-﻿using System.Collections.Concurrent;
-
-namespace DotNetRuleEngine.Core.Interface
+﻿namespace DotNetRuleEngine.Core.Interface
 {
     public interface IRule<T> : IGeneralRule<T> where T : class, new()
     {
-        ConcurrentDictionary<string, object> Data { get; set; }
+        void Initialize();
 
         void BeforeInvoke();
         
@@ -14,6 +12,6 @@ namespace DotNetRuleEngine.Core.Interface
 
         object TryGetValue(string key);
 
-        bool TryAdd(string key, object value);
+        void TryAdd(string key, object value);
     }
 }

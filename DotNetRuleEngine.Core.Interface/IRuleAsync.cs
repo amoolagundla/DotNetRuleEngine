@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace DotNetRuleEngine.Core.Interface
@@ -7,7 +6,7 @@ namespace DotNetRuleEngine.Core.Interface
     {
         bool Parallel { get; set; }
 
-        ConcurrentDictionary<string, Task<object>> Data { get; set; }
+        Task InitializeAsync();
 
         Task BeforeInvokeAsync();
 
@@ -17,6 +16,6 @@ namespace DotNetRuleEngine.Core.Interface
 
         Task<object> TryGetValueAsync(string key);
 
-        bool TryAddAsync(string key, Task<object> value);
+        void TryAddAsync(string key, Task<object> value);
     }
 }

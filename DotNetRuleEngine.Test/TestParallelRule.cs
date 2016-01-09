@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using DotNetRuleEngine.Core;
+﻿using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Test.AsyncRules;
 using DotNetRuleEngine.Test.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -44,21 +42,19 @@ namespace DotNetRuleEngine.Test
                 new ProductNestedParallelUpdateA(),
                 new ProductNestedParallelUpdateB(),
                 new ProductNestedParallelUpdateC());
-            try
-            {
-                var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
 
-            }
-            catch (AggregateException a)
-            {
-                Debug.WriteLine(a);
-            }
-            catch (Exception e)
-            {
+            var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
+            Assert.AreEqual(8, ruleResults.Length);
 
-                Debug.WriteLine(e);
-            }
-            
+        }
+
+        [TestMethod]
+        public void TestNestedParallelRules2()
+        {
+            Foo f = new Foo();
+            var rr = RuleEngineExecutor<Foo>.GetInstance(f)
+                .ApplyRules(new UpdateName())
+                .ExecuteAsync().Result;
 
         }
     }
