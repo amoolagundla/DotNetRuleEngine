@@ -8,6 +8,6 @@ namespace DotNetRuleEngine.Core.Interface
         Expression<Predicate<T>> Constraint { get; set; }
         int? ExecutionOrder { get; set; }
         bool Skip { get; set; }
-        bool Terminate { get; set; }
+        bool? Terminate { get; set; }
     }
 }

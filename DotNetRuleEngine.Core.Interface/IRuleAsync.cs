@@ -14,8 +14,8 @@ namespace DotNetRuleEngine.Core.Interface
         
         Task<IRuleResult> InvokeAsync(T type);
 
-        Task<object> TryGetValueAsync(string key);
+        Task<object> TryGetValueAsync(string key, int timeoutInMs);
 
-        void TryAddAsync(string key, Task<object> value);
+        Task TryAddAsync(string key, Task<object> value);
     }
 }

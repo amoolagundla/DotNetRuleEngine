@@ -16,14 +16,14 @@ namespace DotNetRuleEngine.Core
         public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
 
 
-        public async Task<object> TryGetValueAsync(string key)
+        public async Task<object> TryGetValueAsync(string key, int timeoutInMs = 30000)
         {
-            return await RuleDataManager.GetInstance().GetValueAsync(key, Configuration);
+            return await RuleDataManager.GetInstance().GetValueAsync(key, Configuration, timeoutInMs);
         }
 
-        public void TryAddAsync(string key, Task<object> value)
+        public async Task TryAddAsync(string key, Task<object> value)
         {
-            RuleDataManager.GetInstance().AddOrUpdateAsync(key, value, Configuration);
+            await RuleDataManager.GetInstance().AddOrUpdateAsync(key, value, Configuration);
         }
 
         public ICollection<IGeneralRule<T>> GetRules()

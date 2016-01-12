@@ -10,7 +10,7 @@ namespace DotNetRuleEngine.Core
 
         public bool Skip { get; set; }
 
-        public bool Terminate { get; set; }
+        public bool? Terminate { get; set; }
 
         public int? ExecutionOrder { get; set; }
     }

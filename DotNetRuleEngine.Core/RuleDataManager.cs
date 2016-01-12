@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using DotNetRuleEngine.Core.Interface;
 
@@ -11,7 +11,7 @@ namespace DotNetRuleEngine.Core
         private static readonly Lazy<RuleDataManager> DataManager = new Lazy<RuleDataManager>(() => new RuleDataManager(), true);
 
         private RuleDataManager()
-        {            
+        {
         }
 
         private Lazy<ConcurrentDictionary<string, Task<object>>> AsyncData { get; } = new Lazy<ConcurrentDictionary<string, Task<object>>>(
@@ -21,42 +21,64 @@ namespace DotNetRuleEngine.Core
            () => new ConcurrentDictionary<string, object>(), true);
 
 
-        public void AddOrUpdateAsync<T>(string key, Task<object> value, IConfiguration<T> configuration)
+        public async Task AddOrUpdateAsync<T>(string key, Task<object> value, IConfiguration<T> configuration)
         {
             var ruleengineId = GetRuleengineId(configuration);
 
-            key = BuildKey<T>(key, ruleengineId);
-            AsyncData.Value.AddOrUpdate(key, v => value, (k, v) => value);
-
-            Debug.WriteLine($"{ruleengineId} : {AsyncData.Value.Count}");
+            var keyPair = BuildKey<T>(key, ruleengineId);
+            await Task.FromResult(AsyncData.Value.AddOrUpdate(keyPair.First(), v => value, (k, v) => value));
         }
 
-        public Task<object> GetValueAsync<T>(string key, IConfiguration<T> configuration)
-        {            
+        public async Task<object> GetValueAsync<T>(string key, IConfiguration<T> configuration, int timeoutInMs = 30000)
+        {
+            var timeout = DateTime.Now.AddMilliseconds(timeoutInMs);
+            return await GetValueAsync(key, configuration, timeout);
+        }
+
+        public async Task<object> GetValueAsync<T>(string key, IConfiguration<T> configuration,
+            DateTime timeout)
+        {
             var ruleengineId = GetRuleengineId(configuration);
+            var keyPair = BuildKey<T>(key, ruleengineId);
 
-            key = BuildKey<T>(key, ruleengineId);
+            Task<object> value = null;
+            
 
-            Task<object> value;
-            return AsyncData.Value.TryGetValue(key, out value) ? value : Task.FromResult<object>(null);
+            while (value == null && DateTime.Now < timeout)
+            {
+                AsyncData.Value.TryGetValue(keyPair.First(), out value);
+            }
+
+            return value != null ? await value : null;
         }
 
         public void AddOrUpdate<T>(string key, object value, IConfiguration<T> configuration)
         {
             var ruleengineId = GetRuleengineId(configuration);
+            var keyPair = BuildKey<T>(key, ruleengineId);
 
-            key = BuildKey<T>(key, ruleengineId);
-            Data.Value.AddOrUpdate(key, v => value, (k, v) => value);
+            Data.Value.AddOrUpdate(keyPair.First(), v => value, (k, v) => value);
         }
 
-        public object GetValue<T>(string key, IConfiguration<T> configuration)
+        public object GetValue<T>(string key, IConfiguration<T> configuration, int timeoutInMs = 30000)
+        {
+            var timeout = DateTime.Now.AddMilliseconds(timeoutInMs);
+           return GetValue(key, configuration, timeout);
+        }
+
+        public object GetValue<T>(string key, IConfiguration<T> configuration, DateTime timeout)
         {
             var ruleengineId = GetRuleengineId(configuration);
+            var keyPair = BuildKey<T>(key, ruleengineId);
 
-            key = BuildKey<T>(key, ruleengineId);
+            object value = null;
+            
+            while (value == null && DateTime.Now < timeout)
+            {
+                Data.Value.TryGetValue(keyPair.First(), out value);
+            }
 
-            object value;
-            return Data.Value.TryGetValue(key, out value) ? value : null;
+            return null;
         }
 
         public static RuleDataManager GetInstance()
@@ -64,9 +86,13 @@ namespace DotNetRuleEngine.Core
             return DataManager.Value;
         }
 
-        private static string BuildKey<T>(string key, string ruleengineId)
+        private static string[] BuildKey<T>(string key, string ruleengineId)
         {
-            return string.Join("_", ruleengineId, key);
+            return new[]
+            {
+                string.Join("_", ruleengineId, key),
+                key
+            };
         }
 
         private static string GetRuleengineId<T>(IConfiguration<T> configuration)

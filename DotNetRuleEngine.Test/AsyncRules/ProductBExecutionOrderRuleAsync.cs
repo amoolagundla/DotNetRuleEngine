@@ -10,12 +10,13 @@ namespace DotNetRuleEngine.Test.AsyncRules
         public override Task InitializeAsync()
         {
             Configuration.ExecutionOrder = 1;
+
             return Task.FromResult<object>(null);
         }
 
         public override async Task<IRuleResult> InvokeAsync(Product type)
         {
-            return await Task.FromResult(new RuleResult());
+            return await RuleResult.CreateAsync(new RuleResult());
         }
     }
 }

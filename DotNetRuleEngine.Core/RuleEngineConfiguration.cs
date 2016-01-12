@@ -29,7 +29,7 @@ namespace DotNetRuleEngine.Core
             set { _configuration.Skip = value; }
         }
 
-        public bool Terminate
+        public bool? Terminate
         {
             get { return _configuration.Terminate; }
 

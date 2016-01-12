@@ -18,14 +18,14 @@ namespace DotNetRuleEngine.Core
 
         public Dictionary<string, object> Data { get; set; }
 
-        public IError Error { get; set; }
+        public IError Error { get; set; }        
 
-        public static IRuleResult Null()
+        public static Task<IRuleResult> NullAsync()
         {
-            return null;
+            return Task.FromResult<IRuleResult>(null);
         }
 
-        public static async Task<IRuleResult> Create(RuleResult ruleResult)
+        public static async Task<IRuleResult> CreateAsync(RuleResult ruleResult)
         {
             return await Task.FromResult(ruleResult);
         }

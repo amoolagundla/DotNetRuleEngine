@@ -10,7 +10,7 @@
         
         IRuleResult Invoke(T type);
 
-        object TryGetValue(string key);
+        object TryGetValue(string key, int timeoutInMs);
 
         void TryAdd(string key, object value);
     }
