@@ -154,6 +154,11 @@ namespace DotNetRuleEngine.Core
             {
                 if (CanExecute(pRule.Configuration))
                 {
+                    if (pRule.IsNested)
+                    {
+                        await ExecuteAsyncRules(pRule.GetRules());
+                    }
+
                     var parallelTask = Task.Run(async () =>
                     {
                         await pRule.BeforeInvokeAsync();

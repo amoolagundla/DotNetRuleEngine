@@ -8,6 +8,7 @@ namespace DotNetRuleEngine.Core
 {
     internal class RuleDataManager
     {
+        
         private static readonly Lazy<RuleDataManager> DataManager = new Lazy<RuleDataManager>(() => new RuleDataManager(), true);
 
         private RuleDataManager()
@@ -21,6 +22,8 @@ namespace DotNetRuleEngine.Core
            () => new ConcurrentDictionary<string, object>(), true);
 
 
+        public const int DefaultTimeoutInMs = 15000;
+
         public async Task AddOrUpdateAsync<T>(string key, Task<object> value, IConfiguration<T> configuration)
         {
             var ruleengineId = GetRuleengineId(configuration);
@@ -29,27 +32,25 @@ namespace DotNetRuleEngine.Core
             await Task.FromResult(AsyncData.Value.AddOrUpdate(keyPair.First(), v => value, (k, v) => value));
         }
 
-        public async Task<object> GetValueAsync<T>(string key, IConfiguration<T> configuration, int timeoutInMs = 30000)
+        public async Task<object> GetValueAsync<T>(string key, IConfiguration<T> configuration, int timeoutInMs = DefaultTimeoutInMs)
         {
             var timeout = DateTime.Now.AddMilliseconds(timeoutInMs);
-            return await GetValueAsync(key, configuration, timeout);
-        }
-
-        public async Task<object> GetValueAsync<T>(string key, IConfiguration<T> configuration,
-            DateTime timeout)
-        {
             var ruleengineId = GetRuleengineId(configuration);
             var keyPair = BuildKey<T>(key, ruleengineId);
 
-            Task<object> value = null;
-            
 
-            while (value == null && DateTime.Now < timeout)
+            while (DateTime.Now < timeout)
             {
+                Task<object> value;
                 AsyncData.Value.TryGetValue(keyPair.First(), out value);
+
+                if (value != null)
+                {
+                    return await value;
+                }
             }
 
-            return value != null ? await value : null;
+            throw new TimeoutException($"Unable to get {key}");
         }
 
         public void AddOrUpdate<T>(string key, object value, IConfiguration<T> configuration)
@@ -60,25 +61,24 @@ namespace DotNetRuleEngine.Core
             Data.Value.AddOrUpdate(keyPair.First(), v => value, (k, v) => value);
         }
 
-        public object GetValue<T>(string key, IConfiguration<T> configuration, int timeoutInMs = 30000)
+        public object GetValue<T>(string key, IConfiguration<T> configuration, int timeoutInMs = DefaultTimeoutInMs)
         {
             var timeout = DateTime.Now.AddMilliseconds(timeoutInMs);
-           return GetValue(key, configuration, timeout);
-        }
-
-        public object GetValue<T>(string key, IConfiguration<T> configuration, DateTime timeout)
-        {
             var ruleengineId = GetRuleengineId(configuration);
             var keyPair = BuildKey<T>(key, ruleengineId);
 
-            object value = null;
-            
-            while (value == null && DateTime.Now < timeout)
+            while (DateTime.Now < timeout)
             {
+                object value;
                 Data.Value.TryGetValue(keyPair.First(), out value);
+
+                if (value != null)
+                {
+                    return value;
+                }
             }
 
-            return null;
+            throw new TimeoutException($"Unable to get {key}");
         }
 
         public static RuleDataManager GetInstance()
