@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace DotNetRuleEngine.Core
     public abstract class RuleEngine<T> where T : class, new()
     {
         private readonly Guid _ruleEngineId = Guid.NewGuid();
-        private readonly RuleEngineConfiguration<T> _ruleEngineConfiguration = new RuleEngineConfiguration<T>(new Configuration<T> ());
+        private readonly RuleEngineConfiguration<T> _ruleEngineConfiguration = new RuleEngineConfiguration<T>(new Configuration<T>());
         private readonly ICollection<IRuleResult> _ruleResults = new List<IRuleResult>();
         private readonly ICollection<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
         private readonly ConcurrentBag<Task<IRuleResult>> _parallelRuleResults = new ConcurrentBag<Task<IRuleResult>>();
@@ -69,7 +68,7 @@ namespace DotNetRuleEngine.Core
 
             await InitializeAsync(Rules);
 
-            await ExecuteAsyncRules(Rules);            
+            await ExecuteAsyncRules(Rules);
 
             _parallelRuleResults.ToList().ForEach(rule =>
             {
@@ -100,13 +99,13 @@ namespace DotNetRuleEngine.Core
         {
             foreach (var rule in rules)
             {
-                if (CanExecute(rule.Configuration))
+                if (rule.IsNested)
                 {
-                    if (rule.IsNested)
-                    {
-                        Execute(OrderByExecutionOrder(rule.GetRules()));
-                    }
+                    Execute(OrderByExecutionOrder(rule.GetRules()));
+                }
 
+                if (CanInvoke(rule.Configuration))
+                {
                     rule.BeforeInvoke();
 
                     var ruleResult = rule.Invoke(Instance);
@@ -122,17 +121,19 @@ namespace DotNetRuleEngine.Core
 
         private async Task ExecuteAsyncRules(ICollection<IGeneralRule<T>> rules)
         {
-            await ExecuteParallelRules(rules);
+            await ExecuteParallelRules(rules);            
 
             foreach (var asyncRule in OrderByAsyncRuleExecutionOrder(rules))
             {
-                if (CanExecute(asyncRule.Configuration))
+                if (asyncRule.IsNested)
                 {
-                    if (asyncRule.IsNested)
-                    {
-                        await ExecuteAsyncRules(asyncRule.GetRules());
-                    }
+                    await ExecuteAsyncRules(asyncRule.GetRules());
+                }
 
+                await Task.WhenAll(_parallelRuleResults);
+
+                if (CanInvoke(asyncRule.Configuration))
+                {
                     await asyncRule.BeforeInvokeAsync();
 
                     var ruleResult = await asyncRule.InvokeAsync(Instance);
@@ -143,7 +144,7 @@ namespace DotNetRuleEngine.Core
 
                     AddToAsyncRuleResults(ruleResult, asyncRule.GetType().Name);
                 }
-            }
+            }            
         }
 
         private async Task ExecuteParallelRules(ICollection<IGeneralRule<T>> rules)
@@ -152,7 +153,12 @@ namespace DotNetRuleEngine.Core
 
             foreach (var pRule in parallelRules)
             {
-                if (CanExecute(pRule.Configuration))
+                if (pRule.IsNested)
+                {
+                    await ExecuteAsyncRules(pRule.GetRules());
+                }
+
+                if (CanInvoke(pRule.Configuration))
                 {
                     var parallelTask = Task.Run(async () =>
                     {
@@ -170,11 +176,7 @@ namespace DotNetRuleEngine.Core
                     _parallelRuleResults.Add(parallelTask);
                 }
             }
-
-            await Task.WhenAll(_parallelRuleResults);
         }
-
-        
 
         private ICollection<IRuleAsync<T>> OrderByAsyncRuleExecutionOrder(ICollection<IGeneralRule<T>> rules)
         {
@@ -244,7 +246,6 @@ namespace DotNetRuleEngine.Core
                 .ToList();
         }
 
-
         private void Initialize(ICollection<IGeneralRule<T>> rules)
         {
             foreach (var rule in rules.OfType<IRule<T>>())
@@ -299,7 +300,7 @@ namespace DotNetRuleEngine.Core
             }
         }
 
-        private bool CanExecute(IConfiguration<T> configuration)
+        private bool CanInvoke(IConfiguration<T> configuration)
         {
             return !configuration.Skip && Constrained(configuration.Constraint) && !RuleEngineTerminated();
         }

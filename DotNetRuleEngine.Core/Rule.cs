@@ -12,7 +12,7 @@ namespace DotNetRuleEngine.Core
 
         public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
 
-        public object TryGetValue(string key, int timeoutInMs = 30000)
+        public object TryGetValue(string key, int timeoutInMs = RuleDataManager.DefaultTimeoutInMs)
         {
             return RuleDataManager.GetInstance().GetValue(key, Configuration);
         }
