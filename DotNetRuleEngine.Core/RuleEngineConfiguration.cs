@@ -4,11 +4,13 @@ using DotNetRuleEngine.Core.Interface;
 
 namespace DotNetRuleEngine.Core
 {
-    internal class RuleEngineConfiguration<T> : IConfiguration<T>
+    internal class RuleEngineConfiguration<T> : IRuleEngineConfiguration<T>
     {
         private readonly IConfiguration<T> _configuration;
 
         public Guid RuleEngineId { get; set; }
+
+        public bool InvokeNestedRulesFirst { get; set; } = true;
 
         public RuleEngineConfiguration(IConfiguration<T> configuration)
         {

@@ -1,10 +1,10 @@
 ﻿namespace DotNetRuleEngine.Core
 {
-    public class RuleEngineExecutor<T> : RuleEngine<T> where T : class, new()
+    public sealed class RuleEngineExecutor<T> : RuleEngine<T> where T : class, new()
     {        
         public RuleEngineExecutor(T instance)
         {
-            Instance = instance;
+            SetInstance(instance);
         }
 
         public RuleEngineExecutor()
