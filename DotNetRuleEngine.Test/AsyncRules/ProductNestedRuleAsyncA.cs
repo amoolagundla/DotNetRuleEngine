@@ -7,11 +7,11 @@ namespace DotNetRuleEngine.Test.AsyncRules
 {
     class ProductNestedRuleAsyncA : RuleAsync<Product>
     {
-        public override async Task<IRuleResult> InvokeAsync(Product product)
+        public override async Task<IRuleResult> InvokeAsync()
         {
-            product.Description = "Product Description";
+            Model.Description = "Product Description";
 
-            return await Task.FromResult(new RuleResult { Name = "ProductNestedRuleAsyncA", Result = product.Description });
+            return await Task.FromResult(new RuleResult { Name = "ProductNestedRuleAsyncA", Result = Model.Description });
         }
     }
 }

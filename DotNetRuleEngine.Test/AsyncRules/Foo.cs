@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DotNetRuleEngine.Core;
 using DotNetRuleEngine.Core.Interface;
 
@@ -21,10 +17,10 @@ namespace DotNetRuleEngine.Test.AsyncRules
             Parallel = true;
             return Task.FromResult<object>(null);
         }
-        public override async Task<IRuleResult> InvokeAsync(Foo foo)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(1000);
-            TryAddAsync("Phone", Task.FromResult<object>(2063995220));
+            await TryAddAsync("Phone", Task.FromResult<object>(2063995220));
             return await Task.FromResult<IRuleResult>(null);
         }
     }
@@ -38,12 +34,12 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
 
         }
-        public override async Task<IRuleResult> InvokeAsync(Foo foo)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             var phone = await TryGetValueAsync("Phone");
-            foo.Phone = phone?.ToString();
+            Model.Phone = phone?.ToString();
 
-            return await Task.FromResult<IRuleResult>(new RuleResult { Result = foo });
+            return await Task.FromResult<IRuleResult>(new RuleResult { Result = Model });
 
         }
     }

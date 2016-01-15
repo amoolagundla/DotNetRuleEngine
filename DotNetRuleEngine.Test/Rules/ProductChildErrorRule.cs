@@ -6,11 +6,11 @@ namespace DotNetRuleEngine.Test.Rules
 {
     class ProductChildErrorRule : Rule<Product>
     {
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
-            product.Description = "Product Description";
+            Model.Description = "Product Description";
 
-            return new RuleResult { Result = product.Description, Error = new Error { Message = "Error" } };
+            return new RuleResult { Result = Model.Description, Error = new Error { Message = "Error" } };
         }
     }
 }

@@ -14,7 +14,7 @@ namespace DotNetRuleEngine.Test.Rules
         {
             AddRules(new ProductNestedRuleC());
         }
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
             return null;
         }

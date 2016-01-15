@@ -16,7 +16,7 @@ namespace DotNetRuleEngine.Test.Rules
             TryAdd("Description2", "Product Description2");
         }
 
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
             TryAdd("Description3", "Product Description3");
             return null;

@@ -14,10 +14,10 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product product)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(10);
-            product.Description = "Description";
+            Model.Description = "Description";
 
             return await Task.FromResult<IRuleResult>(null);
         }

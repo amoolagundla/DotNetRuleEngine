@@ -28,7 +28,7 @@ namespace DotNetRuleEngine.Core
             return ruleResults.FirstOrDefault(r => string.Equals(r.Name, ruleName, StringComparison.InvariantCultureIgnoreCase));
         }
 
-        public static RuleEngineExecutor<T> ApplyRules<T>(this RuleEngineExecutor<T> ruleEngineExecutor,
+        public static RuleEngine<T> ApplyRules<T>(this RuleEngine<T> ruleEngineExecutor,
             params IGeneralRule<T>[] rules) where T : class, new()
         {
             ruleEngineExecutor.AddRules(rules);

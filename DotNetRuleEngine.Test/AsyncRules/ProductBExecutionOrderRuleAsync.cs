@@ -14,7 +14,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             return await RuleResult.CreateAsync(new RuleResult());
         }

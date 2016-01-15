@@ -8,6 +8,8 @@ namespace DotNetRuleEngine.Core
     {
         private IList<IGeneralRule<T>> Rules { get; set; } = new List<IGeneralRule<T>>();
 
+        public T Model { get; set; }
+
         public bool IsNested => Rules.Any();
 
         public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
@@ -30,7 +32,7 @@ namespace DotNetRuleEngine.Core
         public void AddRules(params IGeneralRule<T>[] rules)
         {
             Rules = rules;
-        }
+        }        
 
         public virtual void Initialize()
         {
@@ -43,6 +45,6 @@ namespace DotNetRuleEngine.Core
         {
         }
 
-        public abstract IRuleResult Invoke(T type);
+        public abstract IRuleResult Invoke();
     }
 }

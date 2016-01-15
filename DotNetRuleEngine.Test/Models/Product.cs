@@ -2,7 +2,7 @@
 
 namespace DotNetRuleEngine.Test.Models
 {
-    public class Product : RuleEngine<Product>
+    public class Product
     {
         public Product()
         {

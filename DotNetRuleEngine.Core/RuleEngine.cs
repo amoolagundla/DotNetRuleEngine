@@ -12,27 +12,33 @@ namespace DotNetRuleEngine.Core
     /// Rule Engine.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class RuleEngine<T> where T : class, new()
+    public sealed class RuleEngine<T> where T : class, new()
     {
-        private T _instance { get; set; }
+        private T _instance;
+        private ICollection<IGeneralRule<T>> _rules;
         private readonly Guid _ruleEngineId = Guid.NewGuid();
         private readonly RuleEngineConfiguration<T> _ruleEngineConfiguration = new RuleEngineConfiguration<T>(new Configuration<T>());
         private readonly ICollection<IRuleResult> _ruleResults = new List<IRuleResult>();
         private readonly ICollection<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
         private readonly ConcurrentBag<Task<IRuleResult>> _parallelRuleResults = new ConcurrentBag<Task<IRuleResult>>();
 
+
+        public static RuleEngine<T> GetInstance(T instance)
+        {
+            return  new RuleEngine<T> { _instance = instance };
+        }
+
         /// <summary>
         /// Rule engine ctor.
         /// </summary>
-        protected RuleEngine()
+        private RuleEngine()
         {
-            _instance = this as T;
         }
 
         /// <summary>
         /// Rules.
         /// </summary>
-        protected ICollection<IGeneralRule<T>> Rules { get; private set; }
+
 
         /// <summary>
         /// Order of execution
@@ -48,16 +54,16 @@ namespace DotNetRuleEngine.Core
         /// Used to add rules to rule engine.
         /// </summary>
         /// <param name="rules">Rule(s) list.</param>
-        public virtual void AddRules(params IGeneralRule<T>[] rules)
+        public void AddRules(params IGeneralRule<T>[] rules)
         {
-            Rules = rules.ToList();
+            _rules = rules.ToList();
         }
 
         /// <summary>
         /// Used to set instance.
         /// </summary>
         /// <param name="instance">_instance</param>
-        public virtual void SetInstance(T instance)
+        public void SetInstance(T instance)
         {
             _instance = instance;
         }
@@ -66,15 +72,15 @@ namespace DotNetRuleEngine.Core
         /// Used to execute async rules.
         /// </summary>
         /// <returns></returns>
-        public virtual async Task<IRuleResult[]> ExecuteAsync()
+        public async Task<IRuleResult[]> ExecuteAsync()
         {
             ValidateInstance();
 
-            if (Rules == null || !Rules.Any()) return _asyncRuleResults.ToArray();
+            if (_rules == null || !_rules.Any()) return _asyncRuleResults.ToArray();
 
-            await InitializeAsync(Rules);
+            await InitializeAsync(_rules);
 
-            await ExecuteAsyncRules(Rules);
+            await ExecuteAsyncRules(_rules);
 
             _parallelRuleResults.ToList().ForEach(rule =>
             {
@@ -88,15 +94,15 @@ namespace DotNetRuleEngine.Core
         /// Used to execute rules.
         /// </summary>
         /// <returns></returns>
-        public virtual IRuleResult[] Execute()
+        public IRuleResult[] Execute()
         {
             ValidateInstance();
 
-            if (Rules == null || !Rules.Any()) return _ruleResults.ToArray();
+            if (_rules == null || !_rules.Any()) return _ruleResults.ToArray();
 
-            Initialize(Rules);
+            Initialize(_rules);
 
-            Execute(OrderByExecutionOrder(Rules));
+            Execute(OrderByExecutionOrder(_rules));
 
             return _ruleResults.ToArray();
         }
@@ -109,9 +115,11 @@ namespace DotNetRuleEngine.Core
 
                 if (CanInvoke(rule.Configuration))
                 {
+                    rule.Model = _instance;
+
                     rule.BeforeInvoke();
 
-                    var ruleResult = rule.Invoke(_instance);
+                    var ruleResult = rule.Invoke();
 
                     rule.AfterInvoke();
 
@@ -136,9 +144,11 @@ namespace DotNetRuleEngine.Core
 
                 if (CanInvoke(asyncRule.Configuration))
                 {
+                    asyncRule.Model = _instance;
+
                     await asyncRule.BeforeInvokeAsync();
 
-                    var ruleResult = await asyncRule.InvokeAsync(_instance);
+                    var ruleResult = await asyncRule.InvokeAsync();
 
                     await asyncRule.AfterInvokeAsync();
 
@@ -161,11 +171,13 @@ namespace DotNetRuleEngine.Core
 
                 if (CanInvoke(pRule.Configuration))
                 {
+                    pRule.Model = _instance;
+
                     var parallelTask = Task.Run(async () =>
                     {
                         await pRule.BeforeInvokeAsync();
 
-                        var ruleResult = await pRule.InvokeAsync(_instance);
+                        var ruleResult = await pRule.InvokeAsync();
 
                         await pRule.AfterInvokeAsync();
 
@@ -214,6 +226,7 @@ namespace DotNetRuleEngine.Core
         {
             foreach (var rule in rules.OfType<IRule<T>>())
             {
+                rule.Model = _instance;
                 rule.Configuration = new RuleEngineConfiguration<T>(rule.Configuration) { RuleEngineId = _ruleEngineId };
 
                 rule.Initialize();

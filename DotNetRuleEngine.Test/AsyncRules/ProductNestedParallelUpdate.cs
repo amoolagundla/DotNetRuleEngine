@@ -15,7 +15,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(10);
             Debug.WriteLine("ProductNestedParallelUpdateA executed.");
@@ -33,7 +33,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             // await Task.Delay(15);
             Debug.WriteLine("ProductNestedParallelUpdateB executed.");
@@ -51,7 +51,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(30);
             Debug.WriteLine("ProductNestedParallelUpdateB1 executed.");
@@ -69,7 +69,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(30);
             Debug.WriteLine("ProductNestedParallelUpdateB1A1 executed.");
@@ -85,7 +85,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(30);
             Debug.WriteLine("ProductNestedParallelUpdateB1A1A executed.");
@@ -103,7 +103,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(500);
             Debug.WriteLine("ProductNestedParallelUpdateB1A executed.");
@@ -120,7 +120,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(20);
             Debug.WriteLine("ProductNestedParallelUpdateB2 executed.");
@@ -137,7 +137,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product type)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             await Task.Delay(300);
             Debug.WriteLine("ProductNestedParallelUpdateC executed.");

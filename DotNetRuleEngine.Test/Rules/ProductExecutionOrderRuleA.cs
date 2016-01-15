@@ -11,7 +11,7 @@ namespace DotNetRuleEngine.Test.Rules
             Configuration.ExecutionOrder = 2;
         }
 
-        public override IRuleResult Invoke(Product type)
+        public override IRuleResult Invoke()
         {
             return new RuleResult();
         }
@@ -24,7 +24,7 @@ namespace DotNetRuleEngine.Test.Rules
             Configuration.ExecutionOrder = 1;
         }
 
-        public override IRuleResult Invoke(Product type)
+        public override IRuleResult Invoke()
         {
             return new RuleResult();
         }

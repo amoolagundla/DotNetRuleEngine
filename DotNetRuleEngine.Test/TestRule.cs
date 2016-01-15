@@ -14,7 +14,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestInvoke()
         {
-            var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
+            var ruleResults = RuleEngine<Product>.GetInstance(new Product())
                 .ApplyRules(new ProductRule())
                 .Execute();
             
@@ -24,7 +24,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestBeforeInvoke()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             var ruleResults = ruleEngineExecutor.ApplyRules(new ProductRule())
                                                 .Execute();
 
@@ -36,7 +36,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestAfterInvoke()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductTerminateA(), new ProductTerminateB());
             var ruleResults = ruleEngineExecutor.Execute();
             var ruleResult = ruleResults.FindRuleResult("ProductRule");
@@ -47,7 +47,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestSkip()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductSkip());
             var ruleResults = ruleEngineExecutor.Execute();
             Assert.IsFalse(ruleResults.Any());
@@ -57,7 +57,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestTerminate()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductTerminateA(), new ProductTerminateB());
             var ruleResults = ruleEngineExecutor.Execute();
             Assert.AreEqual(1, ruleResults.Length);
@@ -67,7 +67,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestConstraint()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductConstraintA(), new ProductConstraintB());
             var ruleResults = ruleEngineExecutor.Execute();
             Assert.AreEqual(1, ruleResults.Length);
@@ -77,7 +77,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestTryAddTryGetValue()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductTryAdd(), new ProductTryGetValue());
             var ruleResults = ruleEngineExecutor.Execute().FindRuleResult("ProductRule").Result.To<List<string>>();
 
@@ -90,7 +90,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestExecutionOrder()
         {
-            var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
+            var ruleResults = RuleEngine<Product>.GetInstance(new Product())
                 .ApplyRules(new ProductExecutionOrderRuleA(), new ProductExecutionOrderRuleB())
                 .Execute();
 
@@ -101,7 +101,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestErrorResult()
         {
-            var errors = RuleEngineExecutor<Product>.GetInstance(new Product())
+            var errors = RuleEngine<Product>.GetInstance(new Product())
                 .ApplyRules(new ProductRule(), new ProductRuleError())
                 .Execute()
                 .GetErrors();

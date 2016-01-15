@@ -14,15 +14,15 @@ namespace DotNetRuleEngine.Test.AsyncRules
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product product)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             var description = TryGetValueAsync("Description").Result.To<string>();
-            product.Description = $"Product {description}";            
+            Model.Description = $"Product {description}";            
 
             return await RuleResult.CreateAsync(new RuleResult
             {
                 Name = "ProductRule",
-                Result = product.Description,
+                Result = Model.Description,
                 Data = { { "Description", description } }
             });
         }

@@ -10,7 +10,7 @@ namespace DotNetRuleEngine.Test.Rules
         {
             AddRules(new ProductNestedRuleA(), new ProductNestedRuleB());
         }
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
             return null;
         }

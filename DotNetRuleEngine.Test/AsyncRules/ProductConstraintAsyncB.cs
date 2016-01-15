@@ -9,14 +9,14 @@ namespace DotNetRuleEngine.Test.AsyncRules
     {
         public override Task BeforeInvokeAsync()
         {
-            Configuration.Constraint = product => product.Description == "";
+            Configuration.Constraint = product => Model.Description == "";
             return Task.FromResult<object>(null);
         }
 
-        public override async Task<IRuleResult> InvokeAsync(Product product)
+        public override async Task<IRuleResult> InvokeAsync()
         {
-            product.Description = "Product Description";
-            return await Task.FromResult(new RuleResult { Name = "ProductRule", Result = product.Description });
+            Model.Description = "Product Description";
+            return await Task.FromResult(new RuleResult { Name = "ProductRule", Result = Model.Description });
         }
     }
 }

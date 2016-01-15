@@ -11,11 +11,11 @@ namespace DotNetRuleEngine.Test.Rules
             Configuration.ExecutionOrder = 2;
         }
 
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
-            product.Description = "Product Description";
+            Model.Description = "Product Description";
 
-            return new RuleResult { Name = "ProductNestedRuleA", Result = product.Description };
+            return new RuleResult { Name = "ProductNestedRuleA", Result = Model.Description };
         }
     }
 }

@@ -50,7 +50,6 @@
     <Compile Include="RuleEngineConfiguration.cs" />
     <Compile Include="RuleResult.cs" />
     <Compile Include="RuleEngine.cs" />
-    <Compile Include="RuleEngineExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -11,7 +11,7 @@ namespace DotNetRuleEngine.Test.AsyncRules
         {
             AddRules(new ProductNestedRuleAsyncA(), new ProductNestedRuleAsyncB());
         }
-        public override async Task<IRuleResult> InvokeAsync(Product product)
+        public override async Task<IRuleResult> InvokeAsync()
         {
             return await Task.FromResult<IRuleResult>(null);
         }

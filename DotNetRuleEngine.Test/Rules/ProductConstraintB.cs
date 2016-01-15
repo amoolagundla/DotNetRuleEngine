@@ -8,13 +8,13 @@ namespace DotNetRuleEngine.Test.Rules
     {
         public override void BeforeInvoke()
         {
-            Configuration.Constraint = product => product.Description == "";
+            Configuration.Constraint = product => Model.Description == "";
         }
 
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
-            product.Description = "Product Description";
-            return new RuleResult { Name = "ProductRule", Result = product.Description };
+            Model.Description = "Product Description";
+            return new RuleResult { Name = "ProductRule", Result = Model.Description };
         }
     }
 }

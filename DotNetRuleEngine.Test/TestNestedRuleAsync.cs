@@ -11,7 +11,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestAsyncNestedRules()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
 
             ruleEngineExecutor.AddRules(new ProductNestedRuleAsync());
 

@@ -12,7 +12,7 @@ namespace DotNetRuleEngine.Core.Interface
 
         Task AfterInvokeAsync();
         
-        Task<IRuleResult> InvokeAsync(T type);
+        Task<IRuleResult> InvokeAsync();
 
         Task<object> TryGetValueAsync(string key, int timeoutInMs);
 

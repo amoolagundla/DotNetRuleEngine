@@ -11,7 +11,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestNestedRules()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductNestedRule());
             var ruleResults = ruleEngineExecutor.Execute();
             var nestedRuleResult = ruleResults.FindRuleResult<ProductNestedRuleC>();
@@ -23,7 +23,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestNestedRuleError()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductNestedErrorRule());
             var ruleResults = ruleEngineExecutor.Execute();
             var errors = ruleResults.GetErrors();

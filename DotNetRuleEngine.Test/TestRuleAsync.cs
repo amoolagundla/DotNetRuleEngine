@@ -12,7 +12,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestInvokeAsync()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductRuleAsync());
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
             Assert.AreEqual("Product Description", ruleResults.First().Result);
@@ -21,7 +21,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestBeforeInvokeAsync()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductRuleAsync());
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
 
@@ -33,7 +33,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestAfterInvokeAsync()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductTerminateAsyncA(), new ProductTerminateAsyncB());
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
             Assert.AreEqual(1, ruleResults.Length);
@@ -42,7 +42,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestSkipAsync()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductSkipAsync());
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
             Assert.IsFalse(ruleResults.Any());
@@ -52,7 +52,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestTerminateAsync()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductTerminateAsyncA(), new ProductTerminateAsyncB());
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
             Assert.AreEqual(1, ruleResults.Length);
@@ -62,7 +62,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestConstraintAsync()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductConstraintAsyncA(), new ProductConstraintAsyncB());
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
             Assert.AreEqual(1, ruleResults.Length);
@@ -72,7 +72,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestTryAddTryGetValueAsync()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
             ruleEngineExecutor.AddRules(new ProductTryAddAsync(), new ProductTryGetValueAsync());
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
             Assert.AreEqual("Product Description", ruleResults.First().Result);
@@ -81,7 +81,7 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestExecutionOrder()
         {
-            var ruleResults = RuleEngineExecutor<Product>.GetInstance(new Product())
+            var ruleResults = RuleEngine<Product>.GetInstance(new Product())
                 .ApplyRules(new ProductAExecutionOrderRuleAsync(), new ProductBExecutionOrderRuleAsync())
                 .ExecuteAsync().Result;
 

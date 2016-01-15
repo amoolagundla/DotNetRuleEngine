@@ -7,6 +7,8 @@ namespace DotNetRuleEngine.Core
 {
     public abstract class RuleAsync<T> : IRuleAsync<T> where T : class, new()
     {
+        public T Model { get; set; }
+
         public bool Parallel { get; set; }
 
         private IList<IGeneralRule<T>> Rules { get; set; } = new List<IGeneralRule<T>>();
@@ -51,6 +53,6 @@ namespace DotNetRuleEngine.Core
             await Task.FromResult<object>(null);
         }
 
-        public abstract Task<IRuleResult> InvokeAsync(T type);
+        public abstract Task<IRuleResult> InvokeAsync();
     }
 }

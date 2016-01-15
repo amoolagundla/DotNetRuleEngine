@@ -15,7 +15,7 @@ namespace DotNetRuleEngine.Test
         public void TestParallelRules()
         {
             var product = new Product();
-            var engineExecutor = new RuleEngineExecutor<Product>(product);
+            var engineExecutor = RuleEngine<Product>.GetInstance(product);
             var ruleEngineExecutor = engineExecutor;
 
             ruleEngineExecutor.AddRules(
@@ -35,7 +35,7 @@ namespace DotNetRuleEngine.Test
         public void TestNestedParallelRules()
         {
             var product = new Product();
-            var engineExecutor = new RuleEngineExecutor<Product>(product);
+            var engineExecutor = RuleEngine<Product>.GetInstance(product);
             var ruleEngineExecutor = engineExecutor;
 
             ruleEngineExecutor.AddRules(
@@ -52,7 +52,7 @@ namespace DotNetRuleEngine.Test
         public void TestNestedParallelRules2()
         {
             Foo f = new Foo();
-            var rr = RuleEngineExecutor<Foo>.GetInstance(f)
+            var rr = RuleEngine<Foo>.GetInstance(f)
                 .ApplyRules(new UpdateName())
                 .ExecuteAsync().Result;
 

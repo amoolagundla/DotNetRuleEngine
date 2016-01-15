@@ -3,7 +3,9 @@
 namespace DotNetRuleEngine.Core.Interface
 {
     public interface IGeneralRule<T> where T : class, new()
-    { 
+    {
+        T Model { get; set; }
+
         bool IsNested { get; }
 
         IConfiguration<T> Configuration { get; set;  }        
