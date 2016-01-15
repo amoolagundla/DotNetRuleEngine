@@ -8,7 +8,7 @@
 ```csharp
     PM> Install-Package DotNetRuleEngine
 ```
-Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.4.3 "DotNetRuleEngine")
+Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/2.0.0 "DotNetRuleEngine")
 
 
 #### **RuleEngineExecutor API:** ####
@@ -28,24 +28,20 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 
 ```csharp
 
-    //New up your model
     Order order = new Order { Amount = 10.99m };
 
-    //Add rules to run against the model instance
-    var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
-    ruleEngineExecutor.AddRules(new IsValidAmount());
-   
-    //Execute the rules
-    IRuleResult[] ruleResults = ruleEngineExecutor.Execute();
+    var ruleResults = RuleEngine<Order>.GetInstance(order)
+        .ApplyRules(new IsValidAmount())
+        .Execute()
 ```
 
 ###### **IsValidAmount *Rule* (Synchronous)** ######
 ```csharp
     public class IsValidAmount : Rule<Order>
     {   
-        public override IRuleResult Invoke(Order order)
+        public override IRuleResult Invoke()
         {
-            if (order.Amount <= 0.0m)
+            if (Model.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
             }
@@ -60,32 +56,28 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
 
 ```csharp
     
-    //New up your model
     Order order = new Order { Amount = 10.99m };
 
-    //Add rules to run against the model instance
-    var ruleEngineExecutor = new RuleEngineExecutor<Order>(order);
-    ruleEngineExecutor.AddRules(new IsValidAmountAsync());
-    
-    //Execute the rules
-    IRuleResult[] ruleResults = await ruleEngineExecutor.ExecuteAsync();
+    var ruleResults = RuleEngine<Order>.GetInstance(order)
+        .ApplyRules(new IsValidAmount())
+        .ExecuteAsync()
 ```
 
 ###### **IsValidAmountAsync *Rule* (Asynchronous)** ######
 ```csharp
     public class IsValidAmountAsync : RuleAsync<Order>
     {   
-        public override async Task<IRuleResult> Invoke(Order order)
+        public override async Task<IRuleResult> Invoke()
         {
             //Simulate API call to external service
 			await Task.Delay(10);
 
-            if (order.Amount <= 0.0m)
+            if (Model.Amount <= 0.0m)
             {
                 throw new InvalidOperationException();
             }
             
-            return Task.FromResult<object>(null);
+            return await RuleResult.Null()
         }
     }
 ```
@@ -116,93 +108,12 @@ The return value of Rule/RuleAsync.
 
 <br />
 
-
->The difference between RuleEngineExecutor and RuleEngine, when you use RuleEngine, your model *must* inherit from RuleEngine. RuleEngineExecutor doesn't have this requirement.
-
-#### **RuleEngine API** ####
-
-**Examples:**
-
-
-###### **Product (domain model)** ######
-
-```csharp
-    //Inherit your model from RuleEngine<T>
-    public class Product : RuleEngine<Product>
-	{
-		public string Name { get; set; }
-		public decimal Price { get; set; }
-		public string Description { get; set; }
-	}
-```
-
-##### **Synchronous Example:** #####
-
-```csharp
-    
-    //New up your model
-    Product p = new Product();
-
-    //Add rules to run against the model instance
-    p.AddRules(new UpdateDescription());
-
-    //Execute the rules. (Null rule results will be ignored by Execute method)
-    IRuleResult[] ruleResults = p.Execute();
-```
-
-###### **UpdateDescription *Rule* (Synchronous)** ######
-    
-```csharp
-    //Inherit from Rule<T> for synchronous rules
-	public class UpdateDescription : Rule<Product>
-    {
-        public override IRuleResult Invoke(Product product)
-        {
-            product.Description = "Desktop Computer";
-
-			return null; 
-        }
-    }
-```
-
-##### **Asynchronous Example:** #####
-
-```csharp
-
-    //New up your model
-    Product p = new Product();
-    
-    //Add rules to run against the model instance
-    p.AddRules(new UpdateDescriptionAsync());
-
-    //Execute the rules. (Null rule results will be ignored by Execute method)
-    IRuleResult[] ruleResults = await p.ExecuteAsync();
-```
-
-###### **UpdateDescriptionAsync *Rule* (Asynchronous)** ######
-
-```csharp
-    //Inherit from RuleAsync<T> for asynchronous rules
-    public class UpdateDescriptionAsync : RuleAsync<Product>
-    {
-        public override async Task<IRuleResult> InvokeAsync(Product product)
-        {
-            //Simulate API call to external service
-            await Task.Delay(10);
-
-            product.Description = "Desktop Computer";
-
-            return Task.FromResult<object>(null);
-        }
-    }
-```
-
 ----------
 
 #### Features ####
 
 ##### Initialize (a.k.a Lazy Constructor) #####
-Always executes. ( Most of the configuration options must be initialized in ```Initialize``` or ```ctor```. Specifically ```Skip```, ```Constraint```, and ```ExecutionOrder```.
+Always executed. ( Most of the configuration options must be initialized in ```Initialize``` or ```ctor```. Specifically ```Skip```, ```Constraint```, and ```ExecutionOrder```.
 
 ###### Example ######
 ```csharp
