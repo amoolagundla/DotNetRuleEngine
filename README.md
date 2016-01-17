@@ -22,11 +22,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     }
 ```
 
-#### 1) Install dotnetruleengine
-```install-package dotnetruleengine```
-
-
-#### 2) Create rule
+#### Create rule
 
 ```csharp
     public class AmountGreaterThan50Dollars: Rule<Order>
@@ -43,7 +39,7 @@ Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/Do
     }
 ```
 
-#### 3) Invoke rule(s)
+#### Invoke rule(s)
 
 ```csharp
     
