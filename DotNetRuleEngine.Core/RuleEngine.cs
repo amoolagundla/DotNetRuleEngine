@@ -62,8 +62,8 @@ namespace DotNetRuleEngine.Core
         {
             ValidateInstance();
 
-            if (Rules == null || !Rules.Any()) return _asyncRuleResults.ToArray();            
-            
+            if (Rules == null || !Rules.Any()) return _asyncRuleResults.ToArray();
+
             var asynchronousRules = SetupAsyncRules();
 
             var parallelRuleResults = ExecuteParallelRules(Rules).ToList();
@@ -88,11 +88,12 @@ namespace DotNetRuleEngine.Core
                     break;
                 }
             }
+
             if (parallelRuleResults.Any())
             {
                 await Task.WhenAll(parallelRuleResults);
             }
-                
+
             parallelRuleResults.ForEach(rule =>
             {
                 var ruleResult = rule.Result;
@@ -111,7 +112,7 @@ namespace DotNetRuleEngine.Core
         {
             ValidateInstance();
 
-            if (Rules == null || !Rules.Any()) return _ruleResults.ToArray();            
+            if (Rules == null || !Rules.Any()) return _ruleResults.ToArray();
 
             var rules = SetupRules();
 
@@ -124,7 +125,7 @@ namespace DotNetRuleEngine.Core
                 {
                     var ruleResult = rule.Invoke(Instance);
 
-                    AddToRuleResults(ruleResult, rule.GetType().Name, _ruleResults);                        
+                    AddToRuleResults(ruleResult, rule.GetType().Name, _ruleResults);
                 }
 
                 rule.AfterInvoke();
@@ -136,7 +137,7 @@ namespace DotNetRuleEngine.Core
             }
 
             return _ruleResults.ToArray();
-        }        
+        }
 
         private IEnumerable<Task<IRuleResult>> ExecuteParallelRules(IEnumerable<IGeneralRule<T>> rules)
         {
@@ -155,17 +156,14 @@ namespace DotNetRuleEngine.Core
             {
                 AddToAsyncDataCollection(pRule);
 
-                if (!pRule.Skip && Constrained(pRule.Constraint))
+                var parallelTask = Task.Run(() =>
                 {
-                    var parallelTask = Task.Run(() =>
-                    {
-                        return pRule.BeforeInvokeAsync()
-                                .ContinueWith(t => pRule.InvokeAsync(Instance).Result)
-                                .ContinueWith(t => { pRule.AfterInvokeAsync(); return t.Result; });
-                    });
+                    return pRule.BeforeInvokeAsync()
+                        .ContinueWith(t => !pRule.Skip && Constrained(pRule.Constraint) ? pRule.InvokeAsync(Instance).Result : null)
+                        .ContinueWith(t => { pRule.AfterInvokeAsync(); return t.Result; });
+                });
 
-                    parallelRuleResults.Add(parallelTask);
-                }
+                parallelRuleResults.Add(parallelTask);
             });
 
             return parallelRuleResults;
@@ -175,10 +173,10 @@ namespace DotNetRuleEngine.Core
         {
             InitializeExecutionOrder();
 
-            var rulesWithExecutionOrder = 
+            var rulesWithExecutionOrder =
                 GetRulesWithExecutionOrder<IRuleAsync<T>>(r => r.ExecutionOrder.HasValue);
 
-            var rulesWithoutExecutionOrder = 
+            var rulesWithoutExecutionOrder =
                 GetRulesWithoutExecutionOrder<IRuleAsync<T>>(r => !r.Parallel && !r.ExecutionOrder.HasValue);
 
             return rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder);
@@ -233,7 +231,7 @@ namespace DotNetRuleEngine.Core
             }
         }
 
-        private void AddToRuleResults(IRuleResult ruleResult, string ruleName, 
+        private void AddToRuleResults(IRuleResult ruleResult, string ruleName,
             ICollection<IRuleResult> ruleResults)
         {
             if (ruleResult != null)
@@ -244,7 +242,7 @@ namespace DotNetRuleEngine.Core
             }
         }
 
-        private IEnumerable<TK> GetRulesWithoutExecutionOrder<TK>(Func<TK, bool> condition = null) 
+        private IEnumerable<TK> GetRulesWithoutExecutionOrder<TK>(Func<TK, bool> condition = null)
             where TK : IGeneralRule<T>
         {
             condition = condition ?? (k => true);
@@ -253,7 +251,7 @@ namespace DotNetRuleEngine.Core
                 .Where(condition).ToList();
         }
 
-        private IEnumerable<TK> GetRulesWithExecutionOrder<TK>(Func<TK, bool> condition = null) 
+        private IEnumerable<TK> GetRulesWithExecutionOrder<TK>(Func<TK, bool> condition = null)
             where TK : IGeneralRule<T>
         {
             condition = condition ?? (k => true);
