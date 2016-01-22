@@ -14,25 +14,13 @@ namespace DotNetRuleEngine.Core
 
         public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
 
-        public object TryGetValue(string key, int timeoutInMs = RuleDataManager.DefaultTimeoutInMs)
-        {
-            return RuleDataManager.GetInstance().GetValue(key, Configuration);
-        }
+        public object TryGetValue(string key, int timeoutInMs = RuleDataManager.DefaultTimeoutInMs) => RuleDataManager.GetInstance().GetValue(key, Configuration);
 
-        public void TryAdd(string key, object value)
-        {
-            RuleDataManager.GetInstance().AddOrUpdate(key, value, Configuration);
-        }
+        public void TryAdd(string key, object value) => RuleDataManager.GetInstance().AddOrUpdate(key, value, Configuration);
 
-        public ICollection<IGeneralRule<T>> GetRules()
-        {
-            return Rules;
-        }
+        public ICollection<IGeneralRule<T>> GetRules() => Rules;       
 
-        public void AddRules(params IGeneralRule<T>[] rules)
-        {
-            Rules = rules;
-        }        
+        public void AddRules(params IGeneralRule<T>[] rules) => Rules = rules;             
 
         public virtual void Initialize()
         {

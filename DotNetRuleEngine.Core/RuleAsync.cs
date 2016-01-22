@@ -18,40 +18,21 @@ namespace DotNetRuleEngine.Core
         public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
 
 
-        public async Task<object> TryGetValueAsync(string key, int timeoutInMs = RuleDataManager.DefaultTimeoutInMs)
-        {
-            return await RuleDataManager.GetInstance().GetValueAsync(key, Configuration, timeoutInMs);
-        }
+        public async Task<object> TryGetValueAsync(string key, int timeoutInMs = RuleDataManager.DefaultTimeoutInMs) => 
+            await RuleDataManager.GetInstance().GetValueAsync(key, Configuration, timeoutInMs);
 
-        public async Task TryAddAsync(string key, Task<object> value)
-        {
+        public async Task TryAddAsync(string key, Task<object> value) => 
             await RuleDataManager.GetInstance().AddOrUpdateAsync(key, value, Configuration);
-        }
 
-        public ICollection<IGeneralRule<T>> GetRules()
-        {
-            return Rules;
-        }
+        public ICollection<IGeneralRule<T>> GetRules() => Rules;
+        
+        public void AddRules(params IGeneralRule<T>[] rules) => Rules = rules;
 
-        public void AddRules(params IGeneralRule<T>[] rules)
-        {
-            Rules = rules;
-        }
+        public virtual async Task InitializeAsync() => await Task.FromResult<object>(null);
 
-        public virtual async Task InitializeAsync()
-        {
-            await Task.FromResult<object>(null);
-        }
+        public virtual async Task BeforeInvokeAsync() => await Task.FromResult<object>(null);
 
-        public virtual async Task BeforeInvokeAsync()
-        {
-            await Task.FromResult<object>(null);
-        }
-
-        public virtual async Task AfterInvokeAsync()
-        {
-            await Task.FromResult<object>(null);
-        }
+        public virtual async Task AfterInvokeAsync() => await Task.FromResult<object>(null);
 
         public abstract Task<IRuleResult> InvokeAsync();
     }

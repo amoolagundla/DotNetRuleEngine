@@ -22,11 +22,12 @@ namespace DotNetRuleEngine.Core
         private readonly ICollection<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
         private readonly ConcurrentBag<Task<IRuleResult>> _parallelRuleResults = new ConcurrentBag<Task<IRuleResult>>();
 
-
-        public static RuleEngine<T> GetInstance(T instance)
-        {
-            return  new RuleEngine<T> { _instance = instance };
-        }
+        /// <summary>
+        /// Get a new instance of RuleEngine
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        public static RuleEngine<T> GetInstance(T instance) => new RuleEngine<T> { _instance = instance };
 
         /// <summary>
         /// Rule engine ctor.
@@ -34,11 +35,6 @@ namespace DotNetRuleEngine.Core
         private RuleEngine()
         {
         }
-
-        /// <summary>
-        /// Rules.
-        /// </summary>
-
 
         /// <summary>
         /// Order of execution
@@ -54,19 +50,13 @@ namespace DotNetRuleEngine.Core
         /// Used to add rules to rule engine.
         /// </summary>
         /// <param name="rules">Rule(s) list.</param>
-        public void AddRules(params IGeneralRule<T>[] rules)
-        {
-            _rules = rules.ToList();
-        }
+        public void AddRules(params IGeneralRule<T>[] rules) => _rules = rules.ToList();        
 
         /// <summary>
         /// Used to set instance.
         /// </summary>
         /// <param name="instance">_instance</param>
-        public void SetInstance(T instance)
-        {
-            _instance = instance;
-        }
+        public void SetInstance(T instance) => _instance = instance;
 
         /// <summary>
         /// Used to execute async rules.
@@ -277,15 +267,9 @@ namespace DotNetRuleEngine.Core
             }
         }
 
-        private bool CanInvoke(IConfiguration<T> configuration)
-        {
-            return !configuration.Skip && Constrained(configuration.Constraint) && !RuleEngineTerminated();
-        }
+        private bool CanInvoke(IConfiguration<T> configuration) => !configuration.Skip && Constrained(configuration.Constraint) && !RuleEngineTerminated();
 
-        private bool RuleEngineTerminated()
-        {
-            return _ruleEngineConfiguration.Terminate != null && _ruleEngineConfiguration.Terminate.Value;
-        }
+        private bool RuleEngineTerminated() => _ruleEngineConfiguration.Terminate != null && _ruleEngineConfiguration.Terminate.Value;
 
         private static IEnumerable<IRuleAsync<T>> OrderByAsyncRuleExecutionOrder(ICollection<IGeneralRule<T>> rules)
         {
