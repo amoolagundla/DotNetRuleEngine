@@ -7,7 +7,6 @@ namespace DotNetRuleEngine.Core
     {
         bool Parallel { get; set; }
 
-        ConcurrentDictionary<string, Task<object>> Data { get; set; }
         Task BeforeInvokeAsync();
 
         Task AfterInvokeAsync();
@@ -16,6 +15,6 @@ namespace DotNetRuleEngine.Core
 
         Task<object> TryGetValueAsync(string key);
 
-        bool TryAddAsync(string key, Task<object> value);
+        Task TryAddAsync(string key, Task<object> value);
     }
 }

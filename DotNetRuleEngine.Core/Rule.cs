@@ -6,8 +6,6 @@ namespace DotNetRuleEngine.Core
 {
     public abstract class Rule<T> : IRule<T> where T : class, new()
     {
-        public ConcurrentDictionary<string, object> Data { get; set; } = new ConcurrentDictionary<string, object>();
-
         public Expression<Predicate<T>> Constraint { get; set; }
 
         public bool Terminate { get; set; }
@@ -22,13 +20,12 @@ namespace DotNetRuleEngine.Core
 
         public object TryGetValue(string key)
         {
-            object name;
-            return Data.TryGetValue(key, out name) ? name : null;
+            return RuleDataManager.GetInstance().GetValue<T>(key);
         }
 
-        public bool TryAdd(string key, object value)
+        public void TryAdd(string key, object value)
         {
-            return Data.TryAdd(key, value);
+            RuleDataManager.GetInstance().AddOrUpdate<T>(key, value);
         }
 
         public virtual void BeforeInvoke()

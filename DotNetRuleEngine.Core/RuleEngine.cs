@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -13,8 +12,6 @@ namespace DotNetRuleEngine.Core
     /// <typeparam name="T"></typeparam>
     public abstract class RuleEngine<T> where T : class, new()
     {
-        private readonly ConcurrentDictionary<string, object> _sharedData = new ConcurrentDictionary<string, object>();
-        private readonly ConcurrentDictionary<string, Task<object>> _sharedDataAsync = new ConcurrentDictionary<string, Task<object>>();
         private readonly IList<IRuleResult> _ruleResults = new List<IRuleResult>();
         private readonly IList<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
 
@@ -70,8 +67,6 @@ namespace DotNetRuleEngine.Core
 
             foreach (var asyncRule in asynchronousRules)
             {
-                AddToAsyncDataCollection(asyncRule);
-
                 await asyncRule.BeforeInvokeAsync();
 
                 if (!asyncRule.Skip && Constrained(asyncRule.Constraint))
@@ -118,7 +113,6 @@ namespace DotNetRuleEngine.Core
 
             foreach (var rule in rules)
             {
-                AddToDataCollection(rule);
                 rule.BeforeInvoke();
 
                 if (!rule.Skip && Constrained(rule.Constraint))
@@ -154,8 +148,6 @@ namespace DotNetRuleEngine.Core
 
             parallelRules.ForEach(pRule =>
             {
-                AddToAsyncDataCollection(pRule);
-
                 var parallelTask = Task.Run(() =>
                 {
                     return pRule.BeforeInvokeAsync()
@@ -203,32 +195,6 @@ namespace DotNetRuleEngine.Core
         private bool Constrained(Expression<Predicate<T>> predicate)
         {
             return predicate == null || predicate.Compile().Invoke(Instance);
-        }
-
-        private void AddToAsyncDataCollection(IRuleAsync<T> rule)
-        {
-            if (rule != null)
-            {
-                foreach (var pair in rule.Data)
-                {
-                    _sharedDataAsync.TryAdd(pair.Key, pair.Value);
-                }
-
-                rule.Data = _sharedDataAsync;
-            }
-        }
-
-        private void AddToDataCollection(IRule<T> rule)
-        {
-            if (rule != null)
-            {
-                foreach (var pair in rule.Data)
-                {
-                    _sharedData.TryAdd(pair.Key, pair.Value);
-                }
-
-                rule.Data = _sharedData;
-            }
         }
 
         private void AddToRuleResults(IRuleResult ruleResult, string ruleName,

@@ -4,8 +4,6 @@ namespace DotNetRuleEngine.Core
 {
     public interface IRule<T> : IGeneralRule<T> where T : class, new()
     {
-        ConcurrentDictionary<string, object> Data { get; set; }
-
         void BeforeInvoke();
         
         void AfterInvoke();
@@ -14,6 +12,6 @@ namespace DotNetRuleEngine.Core
 
         object TryGetValue(string key);
 
-        bool TryAdd(string key, object value);
+        void TryAdd(string key, object value);
     }
 }
