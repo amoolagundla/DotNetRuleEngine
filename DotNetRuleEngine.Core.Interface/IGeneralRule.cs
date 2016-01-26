@@ -8,6 +8,8 @@ namespace DotNetRuleEngine.Core.Interface
 
         bool IsNested { get; }
 
+        IDependencyResolver DependencyResolver { get; set; }
+
         IConfiguration<T> Configuration { get; set;  }        
 
         ICollection<IGeneralRule<T>> GetRules();

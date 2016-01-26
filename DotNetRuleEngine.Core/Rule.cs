@@ -12,6 +12,8 @@ namespace DotNetRuleEngine.Core
 
         public bool IsNested => Rules.Any();
 
+        public IDependencyResolver DependencyResolver { get; set; }
+
         public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
 
         public object TryGetValue(string key, int timeoutInMs = RuleDataManager.DefaultTimeoutInMs) => RuleDataManager.GetInstance().GetValue(key, Configuration);
