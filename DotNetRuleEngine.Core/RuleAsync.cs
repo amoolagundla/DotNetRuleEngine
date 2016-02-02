@@ -19,7 +19,6 @@ namespace DotNetRuleEngine.Core
 
         public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
 
-
         public async Task<object> TryGetValueAsync(string key, int timeoutInMs = RuleDataManager.DefaultTimeoutInMs) => 
             await RuleDataManager.GetInstance().GetValueAsync(key, Configuration, timeoutInMs);
 

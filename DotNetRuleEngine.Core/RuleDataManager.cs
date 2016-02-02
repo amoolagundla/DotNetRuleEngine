@@ -21,14 +21,13 @@ namespace DotNetRuleEngine.Core
         private Lazy<ConcurrentDictionary<string, object>> Data { get; } = new Lazy<ConcurrentDictionary<string, object>>(
            () => new ConcurrentDictionary<string, object>(), true);
 
-
         public const int DefaultTimeoutInMs = 15000;
 
         public async Task AddOrUpdateAsync<T>(string key, Task<object> value, IConfiguration<T> configuration)
         {
             var ruleengineId = GetRuleengineId(configuration);
 
-            var keyPair = BuildKey<T>(key, ruleengineId);
+            var keyPair = BuildKey(key, ruleengineId);
             await Task.FromResult(AsyncData.Value.AddOrUpdate(keyPair.First(), v => value, (k, v) => value));
         }
 
@@ -36,7 +35,7 @@ namespace DotNetRuleEngine.Core
         {
             var timeout = DateTime.Now.AddMilliseconds(timeoutInMs);
             var ruleengineId = GetRuleengineId(configuration);
-            var keyPair = BuildKey<T>(key, ruleengineId);
+            var keyPair = BuildKey(key, ruleengineId);
 
 
             while (DateTime.Now < timeout)
@@ -56,7 +55,7 @@ namespace DotNetRuleEngine.Core
         public void AddOrUpdate<T>(string key, object value, IConfiguration<T> configuration)
         {
             var ruleengineId = GetRuleengineId(configuration);
-            var keyPair = BuildKey<T>(key, ruleengineId);
+            var keyPair = BuildKey(key, ruleengineId);
 
             Data.Value.AddOrUpdate(keyPair.First(), v => value, (k, v) => value);
         }
@@ -65,7 +64,7 @@ namespace DotNetRuleEngine.Core
         {
             var timeout = DateTime.Now.AddMilliseconds(timeoutInMs);
             var ruleengineId = GetRuleengineId(configuration);
-            var keyPair = BuildKey<T>(key, ruleengineId);
+            var keyPair = BuildKey(key, ruleengineId);
 
             while (DateTime.Now < timeout)
             {
@@ -81,24 +80,10 @@ namespace DotNetRuleEngine.Core
             throw new TimeoutException($"Unable to get {key}");
         }
 
-        public static RuleDataManager GetInstance()
-        {
-            return DataManager.Value;
-        }
+        public static RuleDataManager GetInstance() => DataManager.Value;
 
-        private static string[] BuildKey<T>(string key, string ruleengineId)
-        {
-            return new[]
-            {
-                string.Join("_", ruleengineId, key),
-                key
-            };
-        }
+        private static string[] BuildKey(string key, string ruleengineId) => new[] { string.Join("_", ruleengineId, key), key };
 
-        private static string GetRuleengineId<T>(IConfiguration<T> configuration)
-        {
-            var ruleengineId = ((RuleEngineConfiguration<T>)configuration).RuleEngineId.ToString();
-            return ruleengineId;
-        }
+        private static string GetRuleengineId<T>(IConfiguration<T> configuration) => ((RuleEngineConfiguration<T>)configuration).RuleEngineId.ToString();
     }
 }

@@ -7,14 +7,8 @@ namespace DotNetRuleEngine.Core
 {
     public class NullDependencyResolver : IDependencyResolver
     {
-        public object GetService(Type serviceType)
-        {
-            return default(Type);
-        }
+        public object GetService(Type serviceType) => default(Type);
 
-        public IEnumerable<object> GetServices(Type serviceType)
-        {
-            return Enumerable.Empty<object>();
-        }
+        public IEnumerable<object> GetServices(Type serviceType) => Enumerable.Empty<object>();
     }
 }

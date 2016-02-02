@@ -83,6 +83,8 @@ namespace DotNetRuleEngine.Core
 
             await ExecuteAsyncRules(_rules);
 
+            await Task.WhenAll(_parallelRuleResults);
+
             _parallelRuleResults.ToList().ForEach(rule =>
             {
                 AddToAsyncRuleResults(rule.Result, rule.GetType().Name);
@@ -134,9 +136,7 @@ namespace DotNetRuleEngine.Core
 
                 InvokeNestedRules(!_ruleEngineConfiguration.InvokeNestedRulesFirst, rule);
             }
-        }
-
-       
+        }       
 
         private async Task ExecuteAsyncRules(ICollection<IGeneralRule<T>> rules)
         {
@@ -146,16 +146,14 @@ namespace DotNetRuleEngine.Core
             {
                 await InvokeNestedRulesAsync(_ruleEngineConfiguration.InvokeNestedRulesFirst, asyncRule);
 
-                await Task.WhenAll(_parallelRuleResults);
-
                 if (CanInvoke(asyncRule.Configuration))
                 {
                     asyncRule.Model = _instance;
+
                     TraceVerbose(asyncRule, "BeforeInvokeAsync()");
-
                     await asyncRule.BeforeInvokeAsync();
-                    TraceVerbose(asyncRule, "InvokeAsync()");
 
+                    TraceVerbose(asyncRule, "InvokeAsync()");
                     var ruleResult = await asyncRule.InvokeAsync();
 
                     TraceVerbose(asyncRule, "AfterInvokeAsync()");
