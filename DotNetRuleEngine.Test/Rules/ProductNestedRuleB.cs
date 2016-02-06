@@ -1,17 +1,22 @@
 ﻿using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.Rules
 {
-    class ProductNestedRuleB : NestedRule<Product>
+    class ProductNestedRuleB : Rule<Product>
     {
-        public override IRuleResult Invoke(Product product)
+        public override void Initialize()
         {
-            Instance = product;
+            Configuration.ExecutionOrder = 1;
+        }
+        public ProductNestedRuleB()
+        {
             AddRules(new ProductNestedRuleC());
-            var ruleResults = Execute();
-
-            return new RuleResult { Name = "ProductNestedRuleB", Result = ruleResults };
+        }
+        public override IRuleResult Invoke()
+        {
+            return null;
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.Rules
 {
     class ProductNestedRuleC : Rule<Product>
     {
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
-            product.Description = "Product Description";
+            Model.Description = "Product Description";
 
-            return new RuleResult { Name = "ProductNestedRuleC", Result = product.Description };
+            return new RuleResult { Name = "ProductNestedRuleC", Result = Model.Description };
         }
     }
 }

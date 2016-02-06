@@ -1,33 +1,32 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
+﻿using System.Linq;
+using DotNetRuleEngine.Core.Interface;
+using System.Collections.Generic;
 
 namespace DotNetRuleEngine.Core
 {
     public abstract class Rule<T> : IRule<T> where T : class, new()
     {
-        public Expression<Predicate<T>> Constraint { get; set; }
+        private IList<IGeneralRule<T>> Rules { get; set; } = new List<IGeneralRule<T>>();
 
-        public bool Terminate { get; set; }
+        public T Model { get; set; }
 
-        public bool Skip { get; set; }
+        public bool IsNested => Rules.Any();
 
-        public int? ExecutionOrder { get; set; }
+        public IDependencyResolver DependencyResolver { get; set; }
 
-        public virtual void SetExecutionOrder()
+        public IConfiguration<T> Configuration { get; set; } = new Configuration<T>();
+
+        public object TryGetValue(string key, int timeoutInMs = RuleDataManager.DefaultTimeoutInMs) => RuleDataManager.GetInstance().GetValue(key, Configuration);
+
+        public void TryAdd(string key, object value) => RuleDataManager.GetInstance().AddOrUpdate(key, value, Configuration);
+
+        public ICollection<IGeneralRule<T>> GetRules() => Rules;       
+
+        public void AddRules(params IGeneralRule<T>[] rules) => Rules = rules;             
+
+        public virtual void Initialize()
         {
         }
-
-        public object TryGetValue(string key)
-        {
-            return RuleDataManager.GetInstance().GetValue<T>(key);
-        }
-
-        public void TryAdd(string key, object value)
-        {
-            RuleDataManager.GetInstance().AddOrUpdate<T>(key, value);
-        }
-
         public virtual void BeforeInvoke()
         {
         }
@@ -36,6 +35,6 @@ namespace DotNetRuleEngine.Core
         {
         }
 
-        public abstract IRuleResult Invoke(T type);
+        public abstract IRuleResult Invoke();
     }
 }

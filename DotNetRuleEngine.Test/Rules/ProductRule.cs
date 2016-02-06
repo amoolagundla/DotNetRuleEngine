@@ -1,4 +1,5 @@
 ﻿using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.Rules
@@ -10,11 +11,11 @@ namespace DotNetRuleEngine.Test.Rules
             TryAdd("Key", "Value");
         }
 
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
-            product.Description = "Product Description";
+            Model.Description = "Product Description";
 
-            return new RuleResult { Name = "ProductRule", Result = product.Description, Data = { { "Key", TryGetValue("Key") } } };
+            return new RuleResult { Name = "ProductRule", Result = Model.Description, Data = { { "Key", TryGetValue("Key") } } };
         }
     }
 }

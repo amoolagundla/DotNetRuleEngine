@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using Product = DotNetRuleEngine.Test.Models.Product;
 
 namespace DotNetRuleEngine.Test.Rules
 {
     class ProductTryGetValue : Rule<Product>
     {
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
             var descriptionList = new List<string>
             {

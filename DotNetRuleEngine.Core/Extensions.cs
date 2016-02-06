@@ -2,75 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DotNetRuleEngine.Core.Interface;
 
 namespace DotNetRuleEngine.Core
 {
     public static class Extensions
     {
-        public static T To<T>(this object @object)
-        {
-            return @object != null ? (T)@object : default(T);
-        }
+        public static T To<T>(this object @object) => @object != null ? (T)@object : default(T);
 
-        public static T To<T>(this Task<object> @object)
-        {
-            return @object != null ? (T)@object.Result : default(T);
-        }
+        public static T To<T>(this Task<object> @object) => @object != null ? (T)@object.Result : default(T);
 
-        public static IRuleResult FindRuleResult<T>(this IEnumerable<IRuleResult> ruleResults)
-        {
-            return ruleResults.FirstOrDefault(r => string.Equals(r.Name, typeof(T).Name, StringComparison.InvariantCultureIgnoreCase));
-        }
+        public static IRuleResult FindRuleResult<T>(this IEnumerable<IRuleResult> ruleResults) => 
+            ruleResults.FirstOrDefault(r => string.Equals(r.Name, typeof(T).Name, StringComparison.InvariantCultureIgnoreCase));
 
-        public static IRuleResult FindRuleResult(this IEnumerable<IRuleResult> ruleResults, string ruleName)
-        {
-            return ruleResults.FirstOrDefault(r => string.Equals(r.Name, ruleName, StringComparison.InvariantCultureIgnoreCase));
-        }
+        public static IRuleResult FindRuleResult(this IEnumerable<IRuleResult> ruleResults, string ruleName) => 
+            ruleResults.FirstOrDefault(r => string.Equals(r.Name, ruleName, StringComparison.InvariantCultureIgnoreCase));
 
-        public static IRuleResult FindNestedRuleResult<T>(this IEnumerable<IRuleResult> ruleResults)
-        {
-            if (ruleResults == null)
-            {
-                return null;
-            }
-
-            foreach (var ruleResult in ruleResults)
-            {
-                var result = ruleResult.Result as IEnumerable<IRuleResult>;
-                if (result != null)
-                {
-                    return FindNestedRuleResult<T>(result);
-                }
-
-                if (ruleResult.Name == typeof(T).Name)
-                {
-                    return ruleResult;
-                }
-            }
-            return null;
-        }
-
-        public static IRuleResult FindNestedRuleResult(this IEnumerable<IRuleResult> ruleResults, string ruleName)
-        {
-            foreach (var ruleResult in ruleResults)
-            {
-                var result = ruleResult.Result as IEnumerable<IRuleResult>;
-
-                if (result != null)
-                {
-                    return FindNestedRuleResult(result, ruleName);
-                }
-
-                if (string.Equals(ruleResult.Name, ruleName, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return ruleResult;
-                }
-            }
-
-            return null;
-        }
-
-        public static RuleEngineExecutor<T> ApplyRules<T>(this RuleEngineExecutor<T> ruleEngineExecutor,
+        public static RuleEngine<T> ApplyRules<T>(this RuleEngine<T> ruleEngineExecutor,
             params IGeneralRule<T>[] rules) where T : class, new()
         {
             ruleEngineExecutor.AddRules(rules);
@@ -78,31 +26,6 @@ namespace DotNetRuleEngine.Core
             return ruleEngineExecutor;
         }
 
-        public static IRuleResult[] GetErrors(this IEnumerable<IRuleResult> ruleResults)
-        {
-            var list = new List<IRuleResult>();
-            GetErrors(ruleResults, list);
-
-            return list.ToArray();
-        }
-
-        private static void GetErrors(IEnumerable<IRuleResult> ruleResults,
-            ICollection<IRuleResult> errorResults)
-        {
-            foreach (var ruleResult in ruleResults)
-            {
-                var results = ruleResult.Result as IEnumerable<IRuleResult>;
-
-                if (results != null)
-                {
-                    GetErrors(results, errorResults);
-                }
-
-                if (ruleResult.Error != null)
-                {
-                    errorResults.Add(ruleResult);
-                }
-            }
-        }
+        public static IEnumerable<IRuleResult> GetErrors(this IEnumerable<IRuleResult> ruleResults) => ruleResults.Where(r => r.Error != null);
     }
 }

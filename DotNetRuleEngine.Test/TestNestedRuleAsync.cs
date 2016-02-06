@@ -11,15 +11,14 @@ namespace DotNetRuleEngine.Test
         [TestMethod]
         public void TestAsyncNestedRules()
         {
-            var ruleEngineExecutor = new RuleEngineExecutor<Product>(new Product());
+            var ruleEngineExecutor = RuleEngine<Product>.GetInstance(new Product());
 
             ruleEngineExecutor.AddRules(new ProductNestedRuleAsync());
 
             var ruleResults = ruleEngineExecutor.ExecuteAsync().Result;
-            var nestedRuleResult = ruleResults.FindNestedRuleResult("ProductNestedRuleAsyncC");
 
             Assert.IsNotNull(ruleResults);
-            Assert.AreEqual("ProductNestedRuleAsyncC", nestedRuleResult.Name);
+            Assert.AreEqual("ProductNestedRuleAsyncC", ruleResults.FindRuleResult<ProductNestedRuleAsyncC>().Name);
         }       
     }
 }

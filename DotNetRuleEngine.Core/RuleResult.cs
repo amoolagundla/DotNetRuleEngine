@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using DotNetRuleEngine.Core.Interface;
 
 namespace DotNetRuleEngine.Core
 {
@@ -15,6 +17,16 @@ namespace DotNetRuleEngine.Core
 
         public Dictionary<string, object> Data { get; set; }
 
-        public IError Error { get; set; }
+        public IError Error { get; set; }        
+
+        public static Task<IRuleResult> Nil()
+        {
+            return Task.FromResult<IRuleResult>(null);
+        }
+
+        public static async Task<IRuleResult> CreateAsync(RuleResult ruleResult)
+        {
+            return await Task.FromResult(ruleResult);
+        }
     }
 }

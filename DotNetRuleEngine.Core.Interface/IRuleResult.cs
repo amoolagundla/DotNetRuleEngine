@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DotNetRuleEngine.Core
+namespace DotNetRuleEngine.Core.Interface
 {
     public interface IRuleResult
     {

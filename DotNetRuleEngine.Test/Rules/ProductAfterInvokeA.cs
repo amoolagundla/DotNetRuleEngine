@@ -1,4 +1,5 @@
 ﻿using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.Rules
@@ -7,13 +8,13 @@ namespace DotNetRuleEngine.Test.Rules
     {
         public override void AfterInvoke()
         {
-            Terminate = true;
+            Configuration.Terminate = true;
         }
 
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
-            product.Description = "Product Description";
-            return new RuleResult { Name = "ProductRule", Result = product.Description };
+            Model.Description = "Product Description";
+            return new RuleResult { Name = "ProductRule", Result = Model.Description };
         }
     }
 }

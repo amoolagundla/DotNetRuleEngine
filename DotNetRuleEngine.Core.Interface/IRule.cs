@@ -1,16 +1,16 @@
-﻿using System.Collections.Concurrent;
-
-namespace DotNetRuleEngine.Core
+﻿namespace DotNetRuleEngine.Core.Interface
 {
     public interface IRule<T> : IGeneralRule<T> where T : class, new()
-    {
+    {        
+        void Initialize();
+
         void BeforeInvoke();
         
         void AfterInvoke();
         
-        IRuleResult Invoke(T type);
+        IRuleResult Invoke();
 
-        object TryGetValue(string key);
+        object TryGetValue(string key, int timeoutInMs);
 
         void TryAdd(string key, object value);
     }

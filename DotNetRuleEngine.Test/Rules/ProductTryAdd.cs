@@ -1,11 +1,12 @@
 ﻿using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using Product = DotNetRuleEngine.Test.Models.Product;
 
 namespace DotNetRuleEngine.Test.Rules
 {
     class ProductTryAdd : Rule<Product>
     {
-        public ProductTryAdd()
+        public override void Initialize()
         {
             TryAdd("Description1", "Product Description1");
         }
@@ -15,7 +16,7 @@ namespace DotNetRuleEngine.Test.Rules
             TryAdd("Description2", "Product Description2");
         }
 
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
             TryAdd("Description3", "Product Description3");
             return null;

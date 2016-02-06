@@ -1,4 +1,5 @@
 ﻿using System;
+using DotNetRuleEngine.Core.Interface;
 
 namespace DotNetRuleEngine.Core
 {

@@ -1,19 +1,20 @@
 ﻿using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.Rules
 {
     class ProductConstraintA : Rule<Product>
     {
-        public override void BeforeInvoke()
+        public override void Initialize()
         {
-            Constraint = product => product.Description == "Description";
+            Configuration.Constraint = product => Model.Description == "Description";
         }
 
-        public override IRuleResult Invoke(Product product)
+        public override IRuleResult Invoke()
         {
-            product.Description = "Product Description";
-            return new RuleResult { Name = "ProductRule", Result = product.Description };
+            Model.Description = "Product Description";
+            return new RuleResult { Name = "ProductRule", Result = Model.Description };
         }
     }
 }

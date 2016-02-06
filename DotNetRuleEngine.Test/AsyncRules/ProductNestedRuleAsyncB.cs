@@ -1,18 +1,19 @@
 ﻿using System.Threading.Tasks;
 using DotNetRuleEngine.Core;
+using DotNetRuleEngine.Core.Interface;
 using DotNetRuleEngine.Test.Models;
 
 namespace DotNetRuleEngine.Test.AsyncRules
 {
-    class ProductNestedRuleAsyncB : NestedRuleAsync<Product>
+    class ProductNestedRuleAsyncB : RuleAsync<Product>
     {
-        public override async Task<IRuleResult> InvokeAsync(Product product)
+        public ProductNestedRuleAsyncB()
         {
-            Instance = product;
             AddRules(new ProductNestedRuleAsyncC());
-            var ruleResults = await ExecuteAsync();
-
-            return await Task.FromResult(new RuleResult { Name = "ProductNestedRuleAsyncB", Result = ruleResults });
+        }
+        public override async Task<IRuleResult> InvokeAsync()
+        {
+            return await Task.FromResult<IRuleResult>(null);
         }
     }
 }
