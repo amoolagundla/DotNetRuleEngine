@@ -25,6 +25,11 @@ namespace DotNetRuleEngine.Core
         private readonly ConcurrentBag<Task<IRuleResult>> _parallelRuleResults = new ConcurrentBag<Task<IRuleResult>>();
         private readonly TraceSwitch _traceSwitch = new TraceSwitch("RuleEngineRunningRuleSwitch", "RuleEngine running rules", "0");
 
+        private const string BeforeInvoke = "BeforeInvoke";
+        private const string AfterInvoke = "AFterInvoke";
+        private const string Invoke = "Invoke";
+        private const string Async = "Async";
+
         /// <summary>
         /// Rule engine ctor.
         /// </summary>
@@ -38,8 +43,10 @@ namespace DotNetRuleEngine.Core
         /// Get a new instance of RuleEngine
         /// </summary>
         /// <param name="instance"></param>
+        /// <param name="dependencyResolver"></param>
         /// <returns></returns>
-        public static RuleEngine<T> GetInstance(T instance) => new RuleEngine<T> { _instance = instance };
+        public static RuleEngine<T> GetInstance(T instance, IDependencyResolver dependencyResolver = null) => 
+            new RuleEngine<T> { _instance = instance, _dependencyResolver = dependencyResolver};
 
         /// <summary>
         /// Order of execution
@@ -120,13 +127,13 @@ namespace DotNetRuleEngine.Core
                 {
                     rule.Model = _instance;
 
-                    TraceVerbose(rule, "BeforeInvoke()");
+                    TraceVerbose(rule, BeforeInvoke);
                     rule.BeforeInvoke();
 
-                    TraceVerbose(rule, "Invoke()");
+                    TraceVerbose(rule, Invoke);
                     var ruleResult = rule.Invoke();
 
-                    TraceVerbose(rule, "AfterInvoke()");
+                    TraceVerbose(rule, AfterInvoke);
                     rule.AfterInvoke();
 
                     AddToRuleResults(ruleResult, rule.GetType().Name);
@@ -150,13 +157,13 @@ namespace DotNetRuleEngine.Core
                 {
                     asyncRule.Model = _instance;
 
-                    TraceVerbose(asyncRule, "BeforeInvokeAsync()");
+                    TraceVerbose(asyncRule, BeforeInvoke + Async);
                     await asyncRule.BeforeInvokeAsync();
 
-                    TraceVerbose(asyncRule, "InvokeAsync()");
+                    TraceVerbose(asyncRule, Invoke + Async);
                     var ruleResult = await asyncRule.InvokeAsync();
 
-                    TraceVerbose(asyncRule, "AfterInvokeAsync()");
+                    TraceVerbose(asyncRule, AfterInvoke + Async);
                     await asyncRule.AfterInvokeAsync();
 
                     UpdateRuleEngineConfiguration(asyncRule.Configuration);
@@ -182,13 +189,13 @@ namespace DotNetRuleEngine.Core
 
                     var parallelTask = Task.Run(async () =>
                     {
-                        TraceVerbose(pRule, "BeforeInvokeAsync()");
+                        TraceVerbose(pRule, BeforeInvoke + Async);
                         await pRule.BeforeInvokeAsync();
 
-                        TraceVerbose(pRule, "InvokeAsync()");
+                        TraceVerbose(pRule, Invoke + Async);
                         var ruleResult = await pRule.InvokeAsync();
 
-                        TraceVerbose(pRule, "AfterInvokeAsync()");
+                        TraceVerbose(pRule, AfterInvoke + Async);
                         await pRule.AfterInvokeAsync();
 
                         UpdateRuleEngineConfiguration(pRule.Configuration);

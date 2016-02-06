@@ -19,7 +19,7 @@ namespace DotNetRuleEngine.Core
 
         public IError Error { get; set; }        
 
-        public static Task<IRuleResult> Null()
+        public static Task<IRuleResult> Nil()
         {
             return Task.FromResult<IRuleResult>(null);
         }

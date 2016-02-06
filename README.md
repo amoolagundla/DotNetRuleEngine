@@ -11,6 +11,9 @@
 Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/1.4.3 "DotNetRuleEngine")
 
 
+Get Started at: [DotNetRuleEngine Wiki](https://github.com/ayayalar/DotNetRuleEngine/wiki)
+
+
 #### Model
 
 ```csharp
