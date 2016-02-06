@@ -6,7 +6,7 @@
 
 
 ```csharp
-    PM> Install-Package DotNetRuleEngine
+PM> Install-Package DotNetRuleEngine
 ```
 Nuget package available at: [DotNetRuleEngine](https://www.nuget.org/packages/DotNetRuleEngine/2.0.0 "DotNetRuleEngine")
 
@@ -36,7 +36,7 @@ Order order = new Order { Id = 1, Total = 79.99 };
 *Create a rule to update FreeShipping attribute if the amount is greater than $50.00*
 
 ```csharp
-public class AmountGreaterThan50Dollars: Rule<Order>
+public class QualifiesForFreeShipping: Rule<Order>
 {   
     public override IRuleResult Invoke()
     {
@@ -54,6 +54,6 @@ public class AmountGreaterThan50Dollars: Rule<Order>
 
 ```csharp    
 var ruleResults = RuleEngine<Order>.GetInstance(order)
-    .ApplyRules(new AmountGreaterThan50Dollars())
+    .ApplyRules(new QualifiesForFreeShipping())
     .Execute()
 ```
