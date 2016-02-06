@@ -17,38 +17,43 @@ Get Started at: [DotNetRuleEngine Wiki](https://github.com/ayayalar/DotNetRuleEn
 #### Model
 
 ```csharp
-    public class Order
+public class Order
+{
+    public int Id { get; set; }
+    public decimal Total { get; set; }
+    public bool FreeShipping { get; set; }
+}
+
+Order order = new Order { Id = 1, Total = 79.99 };
+```
+
+#### Install DotNetRuleEngine
+```install-package dotnetruleengine```
+
+
+#### Create Rule(s)
+
+*Create a rule to update FreeShipping attribute if the amount is greater than $50.00*
+
+```csharp
+public class AmountGreaterThan50Dollars: Rule<Order>
+{   
+    public override IRuleResult Invoke()
     {
-        public int Id { get; set; }
-        public decimal Total { get; set; }
-        public bool FreeShipping { get; set; }
-    }
-```
-
-#### Create rule
-
-```csharp
-    public class AmountGreaterThan50Dollars: Rule<Order>
-    {   
-        public override IRuleResult Invoke()
+        if (Model.Total > 50.0m)
         {
-            if (Model.Amount > 50.0m)
-            {
-                Model.FreeShipping = true;
-            }
-            
-            return null;
+            Model.FreeShipping = true;
         }
+        
+        return null;
     }
+}
 ```
 
-#### Invoke rule(s)
+#### Invoke Rule(s)
 
-```csharp
-    
-    Order order = new Order { Amount = 79.99m };
-
-    var ruleResults = RuleEngine<Order>.GetInstance(order)
-        .ApplyRules(new AmountGreaterThan50Dollars())
-        .Execute()
+```csharp    
+var ruleResults = RuleEngine<Order>.GetInstance(order)
+    .ApplyRules(new AmountGreaterThan50Dollars())
+    .Execute()
 ```
