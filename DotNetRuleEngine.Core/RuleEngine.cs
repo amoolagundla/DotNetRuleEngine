@@ -112,14 +112,14 @@ namespace DotNetRuleEngine.Core
 
             Initialize(_rules);
 
-            Execute(OrderByExecutionOrder(_rules));
+            Execute(_rules);
 
             return _ruleResults.ToArray();
         }
 
-        private void Execute(IEnumerable<IRule<T>> rules)
+        private void Execute(IEnumerable<IGeneralRule<T>> rules)
         {
-            foreach (var rule in rules)
+            foreach (var rule in OrderByExecutionOrder(rules))
             {
                 InvokeNestedRules(_ruleEngineConfiguration.InvokeNestedRulesFirst, rule);
 
@@ -145,11 +145,13 @@ namespace DotNetRuleEngine.Core
             }
         }       
 
-        private async Task ExecuteAsyncRules(ICollection<IGeneralRule<T>> rules)
+        private async Task ExecuteAsyncRules(IEnumerable<IGeneralRule<T>> rules)
         {
-            await ExecuteParallelRules(rules);
+            var generalRules = rules.ToList();
 
-            foreach (var asyncRule in OrderByAsyncRuleExecutionOrder(rules))
+            await ExecuteParallelRules(generalRules);
+
+            foreach (var asyncRule in OrderByAsyncRuleExecutionOrder(generalRules))
             {
                 await InvokeNestedRulesAsync(_ruleEngineConfiguration.InvokeNestedRulesFirst, asyncRule);
 
@@ -302,21 +304,24 @@ namespace DotNetRuleEngine.Core
 
         private bool RuleEngineTerminated() => _ruleEngineConfiguration.Terminate != null && _ruleEngineConfiguration.Terminate.Value;
 
-        private static IEnumerable<IRuleAsync<T>> OrderByAsyncRuleExecutionOrder(ICollection<IGeneralRule<T>> rules)
+        private static IEnumerable<IRuleAsync<T>> OrderByAsyncRuleExecutionOrder(IEnumerable<IGeneralRule<T>> rules)
         {
+            var generalRules = rules.ToList();
+
             var rulesWithExecutionOrder =
-                GetRulesWithExecutionOrder<IRuleAsync<T>>(rules, r => r.Configuration.ExecutionOrder.HasValue);
+                GetRulesWithExecutionOrder<IRuleAsync<T>>(generalRules, r => r.Configuration.ExecutionOrder.HasValue);
 
             var rulesWithoutExecutionOrder =
-                GetRulesWithoutExecutionOrder<IRuleAsync<T>>(rules, r => !r.Parallel && !r.Configuration.ExecutionOrder.HasValue);
+                GetRulesWithoutExecutionOrder<IRuleAsync<T>>(generalRules, r => !r.Parallel && !r.Configuration.ExecutionOrder.HasValue);
 
             return rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder).ToList();
         }
 
-        private static IEnumerable<IRule<T>> OrderByExecutionOrder(ICollection<IGeneralRule<T>> rules)
+        private static IEnumerable<IRule<T>> OrderByExecutionOrder(IEnumerable<IGeneralRule<T>> rules)
         {
-            var rulesWithExecutionOrder = GetRulesWithExecutionOrder<IRule<T>>(rules);
-            var rulesWithoutExecutionOrder = GetRulesWithoutExecutionOrder<IRule<T>>(rules);
+            var generalRules = rules.ToList();
+            var rulesWithExecutionOrder = GetRulesWithExecutionOrder<IRule<T>>(generalRules);
+            var rulesWithoutExecutionOrder = GetRulesWithoutExecutionOrder<IRule<T>>(generalRules);
 
             return rulesWithExecutionOrder.Concat(rulesWithoutExecutionOrder).ToList();
         }
