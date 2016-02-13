@@ -26,7 +26,7 @@ namespace DotNetRuleEngine.Core
         private readonly TraceSwitch _traceSwitch = new TraceSwitch("RuleEngineRunningRuleSwitch", "RuleEngine running rules", "0");
 
         private const string BeforeInvoke = "BeforeInvoke";
-        private const string AfterInvoke = "AFterInvoke";
+        private const string AfterInvoke = "AfterInvoke";
         private const string Invoke = "Invoke";
         private const string Async = "Async";
 
