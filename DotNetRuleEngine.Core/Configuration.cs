@@ -13,5 +13,7 @@ namespace DotNetRuleEngine.Core
         public bool? Terminate { get; set; }
 
         public int? ExecutionOrder { get; set; }
+
+        public bool InvokeNestedRulesFirst { get; set; }
     }
 }

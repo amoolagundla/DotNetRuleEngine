@@ -52,6 +52,7 @@
     <Compile Include="RuleResult.cs" />
     <Compile Include="RuleEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TraceMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon\icon_128.ico" />

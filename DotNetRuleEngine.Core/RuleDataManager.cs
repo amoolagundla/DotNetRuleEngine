@@ -13,6 +13,7 @@ namespace DotNetRuleEngine.Core
 
         private RuleDataManager()
         {
+            
         }
 
         private Lazy<ConcurrentDictionary<string, Task<object>>> AsyncData { get; } = new Lazy<ConcurrentDictionary<string, Task<object>>>(
@@ -36,7 +37,6 @@ namespace DotNetRuleEngine.Core
             var timeout = DateTime.Now.AddMilliseconds(timeoutInMs);
             var ruleengineId = GetRuleengineId(configuration);
             var keyPair = BuildKey(key, ruleengineId);
-
 
             while (DateTime.Now < timeout)
             {

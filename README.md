@@ -5,6 +5,14 @@
 > DotNetRuleEngine allows you to write your business logic as series of rules to keep your code clean and structured. Supports both **synchronous** and **asynchronous** execution and it is **S.O.L.I.D** compliant.
 
 
+### A few reasons use DotNetRuleEngine ###
+- S.O.L.I.D
+- Separation of Concern.
+- Encapsulates varying behavior. Such as business rules.
+- Easy to maintain.
+- Testable code.
+
+
 ```csharp
 PM> Install-Package DotNetRuleEngine
 ```

@@ -9,5 +9,7 @@ namespace DotNetRuleEngine.Core.Interface
         int? ExecutionOrder { get; set; }
         bool Skip { get; set; }
         bool? Terminate { get; set; }
+
+        bool InvokeNestedRulesFirst { get; set; }
     }
 }

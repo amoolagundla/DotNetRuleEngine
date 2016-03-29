@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -15,20 +14,14 @@ namespace DotNetRuleEngine.Core
     /// <typeparam name="T"></typeparam>
     public sealed class RuleEngine<T> where T : class, new()
     {
-        private T _instance;        
+        private T _instance;
         private IDependencyResolver _dependencyResolver;
         private readonly Guid _ruleEngineId = Guid.NewGuid();
         private readonly RuleEngineConfiguration<T> _ruleEngineConfiguration = new RuleEngineConfiguration<T>(new Configuration<T>());
-        private readonly ICollection<IGeneralRule<T>> _rules = new List<IGeneralRule<T>>();
+        private readonly List<IGeneralRule<T>> _rules = new List<IGeneralRule<T>>();
         private readonly ICollection<IRuleResult> _ruleResults = new List<IRuleResult>();
         private readonly ICollection<IRuleResult> _asyncRuleResults = new List<IRuleResult>();
         private readonly ConcurrentBag<Task<IRuleResult>> _parallelRuleResults = new ConcurrentBag<Task<IRuleResult>>();
-        private readonly TraceSwitch _traceSwitch = new TraceSwitch("RuleEngineRunningRuleSwitch", "RuleEngine running rules", "0");
-
-        private const string BeforeInvoke = "BeforeInvoke";
-        private const string AfterInvoke = "AfterInvoke";
-        private const string Invoke = "Invoke";
-        private const string Async = "Async";
 
         /// <summary>
         /// Rule engine ctor.
@@ -45,30 +38,14 @@ namespace DotNetRuleEngine.Core
         /// <param name="instance"></param>
         /// <param name="dependencyResolver"></param>
         /// <returns></returns>
-        public static RuleEngine<T> GetInstance(T instance, IDependencyResolver dependencyResolver = null) => 
-            new RuleEngine<T> { _instance = instance, _dependencyResolver = dependencyResolver};
-
-        /// <summary>
-        /// Order of execution
-        /// </summary>
-        public bool InvokeNestedRulesFirst
-        {
-            get { return _ruleEngineConfiguration.InvokeNestedRulesFirst; }
-
-            set { _ruleEngineConfiguration.InvokeNestedRulesFirst = value; }
-        }
+        public static RuleEngine<T> GetInstance(T instance = null, IDependencyResolver dependencyResolver = null) =>
+            new RuleEngine<T> { _instance = instance, _dependencyResolver = dependencyResolver };
 
         /// <summary>
         /// Used to add rules to rule engine.
         /// </summary>
         /// <param name="rules">Rule(s) list.</param>
-        public void AddRules(params IGeneralRule<T>[] rules)
-        {
-            foreach (var rule in rules)
-            {
-                _rules.Add(rule);
-            }
-        }
+        public void AddRules(params IGeneralRule<T>[] rules) => _rules.AddRange(rules);
 
         /// <summary>
         /// Used to set instance.
@@ -84,7 +61,7 @@ namespace DotNetRuleEngine.Core
         {
             ValidateInstance();
 
-            if (_rules == null || !_rules.Any()) return _asyncRuleResults.ToArray();
+            if (!_rules.Any()) return _asyncRuleResults.ToArray();
 
             await InitializeAsync(_rules);
 
@@ -121,19 +98,19 @@ namespace DotNetRuleEngine.Core
         {
             foreach (var rule in OrderByExecutionOrder(rules))
             {
-                InvokeNestedRules(_ruleEngineConfiguration.InvokeNestedRulesFirst, rule);
+                InvokeNestedRules(rule.Configuration.InvokeNestedRulesFirst, rule);
 
                 if (CanInvoke(rule.Configuration))
                 {
                     rule.Model = _instance;
 
-                    TraceVerbose(rule, BeforeInvoke);
+                    TraceMessage.Verbose(rule, TraceMessage.BeforeInvoke);
                     rule.BeforeInvoke();
 
-                    TraceVerbose(rule, Invoke);
+                    TraceMessage.Verbose(rule, TraceMessage.Invoke);
                     var ruleResult = rule.Invoke();
 
-                    TraceVerbose(rule, AfterInvoke);
+                    TraceMessage.Verbose(rule, TraceMessage.AfterInvoke);
                     rule.AfterInvoke();
 
                     AddToRuleResults(ruleResult, rule.GetType().Name);
@@ -141,9 +118,9 @@ namespace DotNetRuleEngine.Core
                     UpdateRuleEngineConfiguration(rule.Configuration);
                 }
 
-                InvokeNestedRules(!_ruleEngineConfiguration.InvokeNestedRulesFirst, rule);
+                InvokeNestedRules(!rule.Configuration.InvokeNestedRulesFirst, rule);
             }
-        }       
+        }
 
         private async Task ExecuteAsyncRules(IEnumerable<IGeneralRule<T>> rules)
         {
@@ -153,19 +130,19 @@ namespace DotNetRuleEngine.Core
 
             foreach (var asyncRule in OrderByAsyncRuleExecutionOrder(generalRules))
             {
-                await InvokeNestedRulesAsync(_ruleEngineConfiguration.InvokeNestedRulesFirst, asyncRule);
+                await InvokeNestedRulesAsync(asyncRule.Configuration.InvokeNestedRulesFirst, asyncRule);
 
                 if (CanInvoke(asyncRule.Configuration))
                 {
                     asyncRule.Model = _instance;
 
-                    TraceVerbose(asyncRule, BeforeInvoke + Async);
+                    TraceMessage.Verbose(asyncRule, TraceMessage.BeforeInvoke + TraceMessage.Async);
                     await asyncRule.BeforeInvokeAsync();
 
-                    TraceVerbose(asyncRule, Invoke + Async);
+                    TraceMessage.Verbose(asyncRule, TraceMessage.Invoke + TraceMessage.Async);
                     var ruleResult = await asyncRule.InvokeAsync();
 
-                    TraceVerbose(asyncRule, AfterInvoke + Async);
+                    TraceMessage.Verbose(asyncRule, TraceMessage.AfterInvoke + TraceMessage.Async);
                     await asyncRule.AfterInvokeAsync();
 
                     UpdateRuleEngineConfiguration(asyncRule.Configuration);
@@ -173,7 +150,7 @@ namespace DotNetRuleEngine.Core
                     AddToAsyncRuleResults(ruleResult, asyncRule.GetType().Name);
                 }
 
-                await InvokeNestedRulesAsync(!_ruleEngineConfiguration.InvokeNestedRulesFirst, asyncRule);                
+                await InvokeNestedRulesAsync(!asyncRule.Configuration.InvokeNestedRulesFirst, asyncRule);
             }
         }
 
@@ -183,7 +160,7 @@ namespace DotNetRuleEngine.Core
 
             foreach (var pRule in parallelRules)
             {
-                await InvokeNestedRulesAsync(_ruleEngineConfiguration.InvokeNestedRulesFirst, pRule);
+                await InvokeNestedRulesAsync(pRule.Configuration.InvokeNestedRulesFirst, pRule);
 
                 if (CanInvoke(pRule.Configuration))
                 {
@@ -191,13 +168,13 @@ namespace DotNetRuleEngine.Core
 
                     var parallelTask = Task.Run(async () =>
                     {
-                        TraceVerbose(pRule, BeforeInvoke + Async);
+                        TraceMessage.Verbose(pRule, TraceMessage.BeforeInvoke + TraceMessage.Async);
                         await pRule.BeforeInvokeAsync();
 
-                        TraceVerbose(pRule, Invoke + Async);
+                        TraceMessage.Verbose(pRule, TraceMessage.Invoke + TraceMessage.Async);
                         var ruleResult = await pRule.InvokeAsync();
 
-                        TraceVerbose(pRule, AfterInvoke + Async);
+                        TraceMessage.Verbose(pRule, TraceMessage.AfterInvoke + TraceMessage.Async);
                         await pRule.AfterInvokeAsync();
 
                         UpdateRuleEngineConfiguration(pRule.Configuration);
@@ -208,38 +185,28 @@ namespace DotNetRuleEngine.Core
                     _parallelRuleResults.Add(parallelTask);
                 }
 
-                await InvokeNestedRulesAsync(!_ruleEngineConfiguration.InvokeNestedRulesFirst, pRule);
+                await InvokeNestedRulesAsync(!pRule.Configuration.InvokeNestedRulesFirst, pRule);
             }
         }
 
         private async Task InvokeNestedRulesAsync(bool invokeNestedRules, IGeneralRule<T> asyncRule)
         {
-            if (invokeNestedRules && asyncRule.IsNested)
-            {
-                await ExecuteAsyncRules(asyncRule.GetRules());
-            }
+            if (invokeNestedRules && asyncRule.IsNested) await ExecuteAsyncRules(asyncRule.GetRules());
         }
 
         private void InvokeNestedRules(bool invokeNestedRules, IGeneralRule<T> rule)
         {
-            if (invokeNestedRules && rule.IsNested)
-            {
-                Execute(OrderByExecutionOrder(rule.GetRules()));
-            }
+            if (invokeNestedRules && rule.IsNested) Execute(OrderByExecutionOrder(rule.GetRules()));
+
         }
 
         private void ValidateInstance()
         {
-            if (_instance == null)
-            {
-                throw new InvalidOperationException("_instance not set");
-            }
+            if (_instance == null) throw new InvalidOperationException("no instance found.");
         }
 
-        private bool Constrained(Expression<Predicate<T>> predicate)
-        {
-            return predicate == null || predicate.Compile().Invoke(_instance);
-        }
+        private bool Constrained(Expression<Predicate<T>> predicate) => predicate == null || predicate.Compile().Invoke(_instance);
+
 
         private void Initialize(IEnumerable<IGeneralRule<T>> rules)
         {
@@ -252,10 +219,7 @@ namespace DotNetRuleEngine.Core
 
                 rule.Initialize();
 
-                if (rule.IsNested)
-                {
-                    Initialize(rule.GetRules());
-                }
+                if (rule.IsNested) Initialize(rule.GetRules());
             }
         }
 
@@ -269,27 +233,18 @@ namespace DotNetRuleEngine.Core
 
                 await rule.InitializeAsync();
 
-                if (rule.IsNested)
-                {
-                    await InitializeAsync(rule.GetRules());
-                }
+                if (rule.IsNested) await InitializeAsync(rule.GetRules());
             }
         }
 
         private void AddToRuleResults(IRuleResult ruleResult, string ruleName)
         {
-            if (ruleResult != null)
-            {
-                _ruleResults.Add(AssignRuleName(ruleResult, ruleName));
-            }
+            if (ruleResult != null) _ruleResults.Add(AssignRuleName(ruleResult, ruleName));
         }
 
         private void AddToAsyncRuleResults(IRuleResult ruleResult, string ruleName)
         {
-            if (ruleResult != null)
-            {
-                _asyncRuleResults.Add(AssignRuleName(ruleResult, ruleName));
-            }
+            if (ruleResult != null) _asyncRuleResults.Add(AssignRuleName(ruleResult, ruleName));
         }
 
         private void UpdateRuleEngineConfiguration(IConfiguration<T> ruleConfiguration)
@@ -338,8 +293,9 @@ namespace DotNetRuleEngine.Core
         {
             condition = condition ?? (k => true);
 
-            return rules.OfType<TK>().Where(r => !r.Configuration.ExecutionOrder.HasValue)
-                .Where(condition).ToList();
+            return rules.OfType<TK>()
+                        .Where(r => !r.Configuration.ExecutionOrder.HasValue)
+                        .Where(condition).ToList();
         }
 
         private static ICollection<TK> GetRulesWithExecutionOrder<TK>(IEnumerable<IGeneralRule<T>> rules,
@@ -348,23 +304,18 @@ namespace DotNetRuleEngine.Core
             condition = condition ?? (k => true);
 
             return rules.OfType<TK>()
-                .Where(r => r.Configuration.ExecutionOrder.HasValue)
-                .Where(condition)
-                .OrderBy(r => r.Configuration.ExecutionOrder)
-                .ToList();
+                        .Where(r => r.Configuration.ExecutionOrder.HasValue)
+                        .Where(condition)
+                        .OrderBy(r => r.Configuration.ExecutionOrder)
+                        .ToList();
         }
 
         private static IEnumerable<IRuleAsync<T>> GetParallelRules(IEnumerable<IGeneralRule<T>> rules)
         {
             return rules.OfType<IRuleAsync<T>>()
-                .Where(r => r.Parallel && !r.Configuration.ExecutionOrder.HasValue)
-                .OrderBy(r => r.GetType().Name)
-                .ToList();
-        }
-
-        private void TraceVerbose(IGeneralRule<T> rule, string message)
-        {
-            Trace.WriteLineIf(_traceSwitch.TraceVerbose, $"Executing {rule.GetType().Name} - {message}", "Information");
+                        .Where(r => r.Parallel && !r.Configuration.ExecutionOrder.HasValue)
+                        .OrderBy(r => r.GetType().Name)
+                        .ToList();
         }
     }
 }
